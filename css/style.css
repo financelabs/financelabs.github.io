@@ -3,10 +3,10 @@
 :root {
     --slate-300: mediumslateblue;
     --slate-600: slategray;
-    --amber-100: lime;
-    --amber-600: mediumspringgreen;
-    --amber-700: green;    
-    --amber-800: darkgreen;
+    --amber-100: #107a40;
+    --amber-600:#107a40;
+    --amber-700: #107a40;
+    --amber-800: #107a40;
     --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
       0 4px 6px -4px rgb(0 0 0 / 0.1);
   }
