@@ -274,7 +274,7 @@
     selectedDictionary: null,
     selectedNote: {},
     caseLayout: [],
-    casePeriods: ["2021", "2022", "2023", "2024"],
+    casePeriods: ["2022", "2023", "2024", "2025"],
     caseColors: ["#dc3545", "#d63384", "#6f42c1", "#6610f2", "#0d6efd", "#adb5bd", "#dc3545", "#d63384", "#ffc107", "#198754", "#20c997", "#adb5bd"],
     actionType: ""
   };
@@ -594,11 +594,11 @@
     }
     return asyncTimeout(275);
   }
-  function sequentialSolution(initialAsyncSeedStoreTasksToDo2) {
+  function sequentialSolution(initialAsyncSeedStoreTasksToDo) {
     return (dispatch) => __async(this, null, function* () {
       dispatch({ type: "SET_STORE_OBJECT", payload: { key: "loading", value: true } });
       const starterPromise = Promise.resolve(null);
-      yield initialAsyncSeedStoreTasksToDo2.reduce(
+      yield initialAsyncSeedStoreTasksToDo.reduce(
         (p, spec) => p.then(() => runTask(spec).then(
           (res) => {
             console.log(res);
@@ -682,70 +682,56 @@
   var dbRef = firebase.database().ref();
   var _a;
   var application = (_a = loadBrowserState("econolabs")) == null ? void 0 : _a.application;
-  console.log(application);
+  var userEmail = !!(application == null ? void 0 : application.email) ? application.email.replace(/[^a-zA-Z0-9]/g, "_") : "test_gmail_com";
   if (!!application) {
     setStoreObject("email", application.email);
     setStoreObject("user", application.user);
+    const initialAsyncSeedStoreTasksToDo = [
+      {
+        task: "seedStoreArray",
+        destination: "caseLayout",
+        items: [
+          { id: "showselectcase", status: true, label: "\u0412\u044B\u0431\u0440\u0430\u0442\u044C \u043F\u0440\u043E\u0435\u043A\u0442" },
+          { id: "showbalance", status: true, label: "\u0411\u0430\u043B\u0430\u043D\u0441" },
+          { id: "showbalancestackedbars", status: false, label: "\u0414\u0438\u0430\u0433\u0440\u0430\u043C\u043C\u0430" },
+          { id: "showfinancialresults", status: false, label: "\u0424\u0438\u043D\u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B" },
+          { id: "showcashflow", status: false, label: "Cash Flow" },
+          { id: "showaccountingmachine", status: true, label: "\u041D\u043E\u0432\u0430\u044F \u0437\u0430\u043F\u0438\u0441\u044C" },
+          { id: "showcreatecase", status: true, label: "\u041D\u043E\u0432\u044B\u0439 \u043F\u0440\u043E\u0435\u043A\u0442" }
+        ]
+      },
+      { task: "wait", duration: 275 },
+      {
+        task: "seedStoreArrayAxios",
+        url: "https://fincalculations.firebaseio.com/usersCraft/" + userEmail + "/posts.json",
+        destination: "casesArray",
+        filterByType: "accountingwithprofitscash"
+      },
+      { task: "wait", duration: 275 },
+      {
+        task: "seedStoreArrayAxios",
+        url: "https://fincalculations.firebaseio.com/opendictionaries/balanceIndicators.json",
+        destination: "dictionaryArray"
+      },
+      { task: "wait", duration: 275 }
+    ];
+    store.dispatch(sequentialSolution(initialAsyncSeedStoreTasksToDo));
+  } else {
+    setStoreObject("loading", true);
+    seedStoreArray("caseLayout", [{ id: "showlogin", status: true, label: "Login" }]);
   }
-  var userEmail = !!(application == null ? void 0 : application.email) ? application.email.replace(/[^a-zA-Z0-9]/g, "_") : "test_gmail_com";
-  console.log(userEmail);
-  var initialAsyncSeedStoreTasksToDo = [
-    {
-      task: "seedStoreArray",
-      destination: "caseLayout",
-      items: [
-        { id: "showbalance", status: true, label: "\u0411\u0430\u043B\u0430\u043D\u0441" },
-        { id: "showfinancialresults", status: true, label: "\u0424\u0438\u043D\u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B" },
-        { id: "showcashflow", status: true, label: "Cash Flow" },
-        { id: "showaccountingmachine", status: true, label: "\u041D\u043E\u0432\u0430\u044F \u0437\u0430\u043F\u0438\u0441\u044C" },
-        { id: "showbalancestackedbars", status: true, label: "\u0414\u0438\u0430\u0433\u0440\u0430\u043C\u043C\u0430" }
-      ]
-    },
-    { task: "wait", duration: 275 },
-    {
-      task: "seedStoreArrayAxios",
-      url: "https://fincalculations.firebaseio.com/usersCraft/nick_golovenkin_yandex_ru/posts.json",
-      destination: "casesArray",
-      filterByType: "accountingwithprofitscash"
-    },
-    { task: "wait", duration: 275 },
-    {
-      task: "seedStoreArrayAxios",
-      url: "https://fincalculations.firebaseio.com/opendictionaries/balanceIndicators.json",
-      destination: "dictionaryArray"
-    },
-    { task: "wait", duration: 275 }
-  ];
-  store.dispatch(sequentialSolution(initialAsyncSeedStoreTasksToDo));
-  function LoadApplication() {
-    const dispatch = instanceReactRedux.useDispatch();
+  function Login() {
     const { register, handleSubmit } = useForm();
+    const showloginStatus = instanceReactRedux.useSelector((state) => {
+      var _a2;
+      return (_a2 = state.caseLayout.find((item) => item.id === "showlogin")) == null ? void 0 : _a2.status;
+    });
     const onSubmit = (application2) => {
-      console.log(application2);
       saveBrowserState("econolabs", { application: application2 });
       setTimeout(window.location.reload(), 1e3);
     };
-    if (!loadBrowserState("econolabs")) {
-      dispatch({ type: "FETCH_STARTED" });
-      return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Navbar, null, /* @__PURE__ */ React.createElement(Navbar.Brand, {
-        href: "#home",
-        style: { marginLeft: "1rem" }
-      }, "Financelabs"), /* @__PURE__ */ React.createElement(Navbar.Toggle, null), /* @__PURE__ */ React.createElement(Navbar.Collapse, {
-        className: "justify-content-end"
-      }, /* @__PURE__ */ React.createElement(Navbar.Text, null, /* @__PURE__ */ React.createElement("a", {
-        href: "/"
-      }, /* @__PURE__ */ React.createElement("img", {
-        src: "https://sun9-37.userapi.com/c317630/v317630439/76a0/Bz6QTfBog0I.jpg?ava=1",
-        alt: "",
-        style: {
-          marginRight: "1rem",
-          width: "40px",
-          height: "40px",
-          borderRadius: "50%",
-          filter: "grayscale(100%)",
-          objectFit: "cover"
-        }
-      }))))), /* @__PURE__ */ React.createElement(Container, null, /* @__PURE__ */ React.createElement(Form, {
+    if (showloginStatus) {
+      return /* @__PURE__ */ React.createElement(Container, null, /* @__PURE__ */ React.createElement(Form, {
         onSubmit: handleSubmit(onSubmit),
         className: "p-3"
       }, /* @__PURE__ */ React.createElement(Form.Group, {
@@ -770,25 +756,18 @@
         variant: "outline-secondary",
         size: "sm",
         type: "submit"
-      }, "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C"))));
+      }, "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C")));
     }
-    return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Navbar, null, /* @__PURE__ */ React.createElement(Navbar.Brand, {
-      href: "#home"
-    }, /* @__PURE__ */ React.createElement("img", {
-      src: "https://source.unsplash.com/random/?smile/",
-      alt: "",
-      style: {
-        marginLeft: "1rem",
-        width: "40px",
-        height: "40px",
-        borderRadius: "50%",
-        filter: "grayscale(100%)",
-        objectFit: "cover"
-      }
-    })), /* @__PURE__ */ React.createElement(Navbar.Toggle, null), /* @__PURE__ */ React.createElement(Navbar.Collapse, {
+    return null;
+  }
+  function BlogNavBar() {
+    return /* @__PURE__ */ React.createElement(Navbar, null, /* @__PURE__ */ React.createElement(Navbar.Brand, {
+      href: "#home",
+      style: { marginLeft: "1rem" }
+    }, "Financelabs"), /* @__PURE__ */ React.createElement(Navbar.Toggle, null), /* @__PURE__ */ React.createElement(Navbar.Collapse, {
       className: "justify-content-end"
     }, /* @__PURE__ */ React.createElement(Navbar.Text, null, /* @__PURE__ */ React.createElement("a", {
-      href: "#login"
+      href: "/"
     }, /* @__PURE__ */ React.createElement("img", {
       src: "https://sun9-37.userapi.com/c317630/v317630439/76a0/Bz6QTfBog0I.jpg?ava=1",
       alt: "",
@@ -800,7 +779,7 @@
         filter: "grayscale(100%)",
         objectFit: "cover"
       }
-    }))))));
+    })))));
   }
   function AccountingNavBar() {
     const loading = instanceReactRedux.useSelector((state) => state.loading);
@@ -816,7 +795,6 @@
         });
         seedStoreArray("caseLayout", updatedCaseLayout);
       };
-      console.log(caseLayout);
       return /* @__PURE__ */ React.createElement("div", {
         className: "container p-2"
       }, /* @__PURE__ */ React.createElement("div", {
@@ -840,21 +818,94 @@
     return null;
   }
   function SelectCase() {
+    const showselectcaseStatus = instanceReactRedux.useSelector((state) => {
+      var _a2;
+      return (_a2 = state.caseLayout.find((item) => item.id === "showselectcase")) == null ? void 0 : _a2.status;
+    });
     const casesArray = instanceReactRedux.useSelector((state) => state.casesArray);
-    function doSelect(item) {
-      setStoreObject("selectedCase", item);
-      seedStoreArray("caseArray", item.content);
+    if (showselectcaseStatus) {
+      let doSelect = function(item) {
+        setStoreObject("selectedCase", item);
+        seedStoreArray("caseArray", !!(item == null ? void 0 : item.content) ? item.content : []);
+      };
+      return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(Container, null, casesArray.map(
+        (item) => /* @__PURE__ */ React.createElement(Row, {
+          key: item.id,
+          className: "p-1"
+        }, /* @__PURE__ */ React.createElement(Col, null, /* @__PURE__ */ React.createElement("small", null, item.title)), /* @__PURE__ */ React.createElement(Col, null, item.date), /* @__PURE__ */ React.createElement(Col, null, /* @__PURE__ */ React.createElement(Button, {
+          variant: "outline-secondary",
+          size: "sm",
+          onClick: () => doSelect(item)
+        }, "\u041E\u0442\u043A\u0440\u044B\u0442\u044C")))
+      )));
+    } else {
+      return null;
     }
-    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(Container, null, casesArray.map(
-      (item) => /* @__PURE__ */ React.createElement(Row, {
-        key: item.id,
-        className: "p-1"
-      }, /* @__PURE__ */ React.createElement(Col, null, /* @__PURE__ */ React.createElement("small", null, item.title)), /* @__PURE__ */ React.createElement(Col, null, item.date), /* @__PURE__ */ React.createElement(Col, null, /* @__PURE__ */ React.createElement(Button, {
+  }
+  function CreateCase() {
+    const { register, handleSubmit } = useForm();
+    const showcreatecaseStatus = instanceReactRedux.useSelector((state) => {
+      var _a2;
+      return (_a2 = state.caseLayout.find((item) => item.id === "showcreatecase")) == null ? void 0 : _a2.status;
+    });
+    const user = instanceReactRedux.useSelector((state) => state.user);
+    const email = instanceReactRedux.useSelector((state) => state.email);
+    const avatarUrl = instanceReactRedux.useSelector((state) => state.avatarUrl);
+    if (showcreatecaseStatus) {
+      let onSubmit = function(data) {
+        console.log(data);
+        let idPost = firebase.database().ref(userEmail).child("posts").push().key;
+        let selectedCase = {
+          id: idPost,
+          title: data.title,
+          theme: "\u041F\u043B\u0430\u043D\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435 \u0438 \u0431\u044E\u0434\u0436\u0435\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435",
+          answer: "\u041E\u043F\u0435\u0440\u0430\u0446\u0438\u0438 \u0438 \u043F\u0440\u043E\u0433\u043D\u043E\u0437\u043D\u0430\u044F \u043E\u0442\u0447\u0435\u0442\u043D\u043E\u0441\u0442\u044C",
+          comment: data.comment,
+          type: "accountingwithprofitscash",
+          content: [],
+          quizString: "\u041E\u043F\u0435\u0440\u0430\u0446\u0438\u0438 \u0438 \u043F\u0440\u043E\u0433\u043D\u043E\u0437\u043D\u0430\u044F \u043E\u0442\u0447\u0435\u0442\u043D\u043E\u0441\u0442\u044C",
+          deleted: false,
+          email,
+          user,
+          avatarUrl: !!avatarUrl ? avatarUrl : null,
+          date: new Intl.DateTimeFormat("ru", {
+            weekday: "short",
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric"
+          }).format(new Date())
+        };
+        updateAccountingWithProfitsCashProject(dbRef, selectedCase, userEmail).then(() => window.location.reload());
+      };
+      return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(Container, null, /* @__PURE__ */ React.createElement(Form, {
+        onSubmit: handleSubmit(onSubmit),
+        className: "p-3"
+      }, /* @__PURE__ */ React.createElement(Form.Group, {
+        className: "mb-3",
+        controlId: "formTitle"
+      }, /* @__PURE__ */ React.createElement(Form.Label, null, "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u0430"), /* @__PURE__ */ React.createElement(Form.Control, __spreadProps(__spreadValues({
+        type: "text",
+        placeholder: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435"
+      }, register("title")), {
+        required: true
+      })), /* @__PURE__ */ React.createElement(Form.Text, {
+        className: "text-muted"
+      }, "\u0416\u0435\u043B\u0430\u0442\u0435\u043B\u044C\u043D\u043E \u0443\u043A\u0430\u0437\u0430\u0442\u044C \u0434\u0430\u0442\u0443 \u0438\u043B\u0438 \u043C\u0435\u0441\u044F\u0446")), /* @__PURE__ */ React.createElement(Form.Group, {
+        className: "mb-3",
+        controlId: "formComment"
+      }, /* @__PURE__ */ React.createElement(Form.Label, null, "\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439"), /* @__PURE__ */ React.createElement(Form.Control, __spreadValues({
+        type: "text",
+        placeholder: "\u0412\u0430\u0440\u0438\u0430\u043D\u0442 \u043F\u0440\u043E\u0435\u043A\u0442\u0430 (\u0431\u0430\u0437\u043E\u0432\u044B\u0439, \u043E\u043F\u0442\u0438\u043C\u0438\u0441\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439, \u043F\u0435\u0441\u0441\u0438\u043C\u0438\u0441\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439)"
+      }, register("comment")))), /* @__PURE__ */ React.createElement(Button, {
         variant: "outline-secondary",
         size: "sm",
-        onClick: () => doSelect(item)
-      }, "\u041E\u0442\u043A\u0440\u044B\u0442\u044C")))
-    )));
+        type: "submit"
+      }, "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C"))));
+    } else {
+      return null;
+    }
   }
   function ShowBalanceStackedBars() {
     const loading = instanceReactRedux.useSelector((state) => state.loading);
@@ -1058,7 +1109,9 @@
     const { register, handleSubmit, reset, watch, formState: { errors } } = useForm();
     if (showaccountingmachine && !loading) {
       const onSubmit = (bookentry) => {
-        updateAccountingWithProfitsCashProject(dbRef, __spreadProps(__spreadValues({}, selectedCase), { content: [...selectedCase.content, bookentry] }), userEmail).then(() => reset({ period: "...", d: "...", k: "...", sum: 0 }));
+        updateAccountingWithProfitsCashProject(dbRef, __spreadProps(__spreadValues({}, selectedCase), {
+          content: !!(selectedCase == null ? void 0 : selectedCase.content) && Array.isArray(selectedCase.content) && selectedCase.content.length > 0 ? [...selectedCase.content, bookentry] : [bookentry]
+        }), userEmail).then(() => reset({ period: "...", d: "...", k: "...", sum: 0 }));
       };
       const capitalIncrease = watch("k") === "\u041D\u0435\u0440\u0430\u0441\u043F\u0440\u0435\u0434\u0435\u043B\u0435\u043D\u043D\u0430\u044F \u043F\u0440\u0438\u0431\u044B\u043B\u044C" ? true : false;
       const capitalDecrease = watch("d") === "\u041D\u0435\u0440\u0430\u0441\u043F\u0440\u0435\u0434\u0435\u043B\u0435\u043D\u043D\u0430\u044F \u043F\u0440\u0438\u0431\u044B\u043B\u044C" ? true : false;
@@ -1151,6 +1204,6 @@
   var root = ReactDOM.createRoot(container);
   root.render(/* @__PURE__ */ React.createElement(instanceReactRedux.Provider, {
     store
-  }, /* @__PURE__ */ React.createElement(LoadApplication, null), /* @__PURE__ */ React.createElement(SelectCase, null), /* @__PURE__ */ React.createElement(AccountingNavBar, null), /* @__PURE__ */ React.createElement(ShowBalance, null), /* @__PURE__ */ React.createElement(ShowBalanceStackedBars, null), /* @__PURE__ */ React.createElement(ShowFinancialResults, null), /* @__PURE__ */ React.createElement(ShowCashFlow, null), /* @__PURE__ */ React.createElement(AccountingMachine, null), /* @__PURE__ */ React.createElement(RecordsList, null)));
+  }, /* @__PURE__ */ React.createElement(BlogNavBar, null), /* @__PURE__ */ React.createElement(Login, null), /* @__PURE__ */ React.createElement(SelectCase, null), /* @__PURE__ */ React.createElement(AccountingNavBar, null), /* @__PURE__ */ React.createElement(ShowBalance, null), /* @__PURE__ */ React.createElement(ShowBalanceStackedBars, null), /* @__PURE__ */ React.createElement(ShowFinancialResults, null), /* @__PURE__ */ React.createElement(ShowCashFlow, null), /* @__PURE__ */ React.createElement(AccountingMachine, null), /* @__PURE__ */ React.createElement(RecordsList, null), /* @__PURE__ */ React.createElement(CreateCase, null)));
 })();
 //# sourceMappingURL=index.js.map
