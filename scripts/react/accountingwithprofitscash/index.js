@@ -267,7 +267,7 @@
     slidesArray: [],
     selectedSlide: {},
     caseArray: [],
-    filteredCaseArray: [],
+    selectedFilter: null,
     casesArray: [],
     dictionariesArray: [],
     dictionaryArray: [],
@@ -612,29 +612,36 @@
   }
   function updateAccountingWithProfitsCashProject(dbRef2, selectedCase, userEmail2) {
     return __async(this, null, function* () {
-      console.log(selectedCase);
       seedStoreArray("caseArray", selectedCase.content);
       let newPostKey = yield dbRef2.child("usersCraft/" + userEmail2 + "/posts/" + selectedCase.id + "/content").push().key;
-      console.log(newPostKey);
-      yield Promise.all(
-        [
-          updateFirebaseNode(
-            url = "openmedia/" + selectedCase.id,
-            updateNodeObject = selectedCase,
-            dbRef2
-          ),
-          updateFirebaseNode(
-            url = "/usersTemplates/projects/" + userEmail2 + "/" + selectedCase.id,
-            updateNodeObject = selectedCase,
-            dbRef2
-          ),
-          updateFirebaseNode(
-            url = "/usersCraft/" + userEmail2 + "/posts/" + selectedCase.id,
-            updateNodeObject = selectedCase,
-            dbRef2
-          )
-        ]
-      ).then((values) => {
+      let currentDay2 = new Intl.DateTimeFormat("en", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      }).format(new Date()).replace(/[^a-zA-Z0-9]/g, "_");
+      yield Promise.all([
+        updateFirebaseNode(
+          url = "openmedia/" + selectedCase.id,
+          updateNodeObject = selectedCase,
+          dbRef2
+        ),
+        updateFirebaseNode(
+          url = "/usersTemplates/projects/" + userEmail2 + "/" + selectedCase.id,
+          updateNodeObject = selectedCase,
+          dbRef2
+        ),
+        updateFirebaseNode(
+          url = "/usersCraft/" + userEmail2 + "/posts/" + selectedCase.id,
+          updateNodeObject = selectedCase,
+          dbRef2
+        ),
+        updateFirebaseNode(
+          url = "/currentDay/" + currentDay2 + "/posts/" + selectedCase.id,
+          updateNodeObject = selectedCase,
+          dbRef2
+        )
+      ]).then((values) => {
         console.log("Updated paths " + values);
       });
     });
@@ -666,9 +673,10 @@
   var Col = ReactBootstrap.Col;
   var Form = ReactBootstrap.Form;
   var Button = ReactBootstrap.Button;
-  var ButtonGroup = ReactBootstrap.ButtonGroup;
   var Container = ReactBootstrap.Container;
   var Navbar = ReactBootstrap.Navbar;
+  var Dropdown = ReactBootstrap.Dropdown;
+  var DropdownButton = ReactBootstrap.DropdownButton;
   var firebaseConfig = {
     apiKey: "AIzaSyDUamZR2aXuP2rFG1AFpb1Ni8aZA5uhSj4",
     authDomain: "fincalculations.firebaseapp.com",
@@ -697,7 +705,9 @@
           { id: "showfinancialresults", status: false, label: "\u0424\u0438\u043D\u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B" },
           { id: "showcashflow", status: false, label: "Cash Flow" },
           { id: "showaccountingmachine", status: true, label: "\u041D\u043E\u0432\u0430\u044F \u0437\u0430\u043F\u0438\u0441\u044C" },
-          { id: "showcreatecase", status: true, label: "\u041D\u043E\u0432\u044B\u0439 \u043F\u0440\u043E\u0435\u043A\u0442" }
+          { id: "showcreatecase", status: true, label: "\u041D\u043E\u0432\u044B\u0439 \u043F\u0440\u043E\u0435\u043A\u0442" },
+          { id: "showrecordslist", status: true, label: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0439" },
+          { id: "showlogin", status: false, label: "\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C" }
         ]
       },
       { task: "wait", duration: 275 },
@@ -726,6 +736,8 @@
       var _a2;
       return (_a2 = state.caseLayout.find((item) => item.id === "showlogin")) == null ? void 0 : _a2.status;
     });
+    const email = instanceReactRedux.useSelector((state) => state.email);
+    const user = instanceReactRedux.useSelector((state) => state.user);
     const onSubmit = (application2) => {
       saveBrowserState("econolabs", { application: application2 });
       setTimeout(window.location.reload(), 1e3);
@@ -739,7 +751,7 @@
         controlId: "formEmail"
       }, /* @__PURE__ */ React.createElement(Form.Label, null, "Email"), /* @__PURE__ */ React.createElement(Form.Control, __spreadProps(__spreadValues({
         type: "email",
-        placeholder: "email"
+        placeholder: !!email && email.length > 6 ? email : "email"
       }, register("email")), {
         required: true
       })), /* @__PURE__ */ React.createElement(Form.Text, {
@@ -749,7 +761,7 @@
         controlId: "formUser"
       }, /* @__PURE__ */ React.createElement(Form.Label, null, "\u0424\u0418\u041E \u0413\u0440\u0443\u043F\u043F\u0430"), /* @__PURE__ */ React.createElement(Form.Control, __spreadProps(__spreadValues({
         type: "text",
-        placeholder: "\u0424\u0418\u041E \u0413\u0440\u0443\u043F\u043F\u0430"
+        placeholder: !!user && user.length > 6 ? user : "\u0424\u0418\u041E \u0413\u0440\u0443\u043F\u043F\u0430"
       }, register("user")), {
         required: true
       }))), /* @__PURE__ */ React.createElement(Button, {
@@ -782,10 +794,8 @@
     })))));
   }
   function AccountingNavBar() {
-    const loading = instanceReactRedux.useSelector((state) => state.loading);
-    const dispatch = instanceReactRedux.useDispatch();
     const caseLayout = instanceReactRedux.useSelector((state) => state.caseLayout);
-    if (!loading && caseLayout.length > 0) {
+    if (caseLayout.length > 0) {
       let doToggle = function(id, status) {
         let updatedCaseLayout = caseLayout.map((obj) => {
           if (obj.id === id) {
@@ -892,13 +902,15 @@
         required: true
       })), /* @__PURE__ */ React.createElement(Form.Text, {
         className: "text-muted"
-      }, "\u0416\u0435\u043B\u0430\u0442\u0435\u043B\u044C\u043D\u043E \u0443\u043A\u0430\u0437\u0430\u0442\u044C \u0434\u0430\u0442\u0443 \u0438\u043B\u0438 \u043C\u0435\u0441\u044F\u0446")), /* @__PURE__ */ React.createElement(Form.Group, {
+      }, "\u0416\u0435\u043B\u0430\u0442\u0435\u043B\u044C\u043D\u043E \u0440\u0430\u0441\u043A\u0440\u044B\u0442\u044C \u0441\u0443\u0442\u044C \u043F\u0440\u043E\u0435\u043A\u0442\u0430 (\u043A\u043E\u043C\u043F\u0430\u043D\u0438\u044E) \u0438 \u0443\u043A\u0430\u0437\u0430\u0442\u044C \u0434\u0430\u0442\u0443 \u0438\u043B\u0438 \u043C\u0435\u0441\u044F\u0446 \u0442\u0435\u043A\u0443\u0449\u0435\u0433\u043E \u0432\u0430\u0440\u0438\u0430\u043D\u0442\u0430")), /* @__PURE__ */ React.createElement(Form.Group, {
         className: "mb-3",
         controlId: "formComment"
       }, /* @__PURE__ */ React.createElement(Form.Label, null, "\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439"), /* @__PURE__ */ React.createElement(Form.Control, __spreadValues({
         type: "text",
-        placeholder: "\u0412\u0430\u0440\u0438\u0430\u043D\u0442 \u043F\u0440\u043E\u0435\u043A\u0442\u0430 (\u0431\u0430\u0437\u043E\u0432\u044B\u0439, \u043E\u043F\u0442\u0438\u043C\u0438\u0441\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439, \u043F\u0435\u0441\u0441\u0438\u043C\u0438\u0441\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439)"
-      }, register("comment")))), /* @__PURE__ */ React.createElement(Button, {
+        placeholder: "\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439"
+      }, register("comment"))), /* @__PURE__ */ React.createElement(Form.Text, {
+        className: "text-muted"
+      }, "\u0412\u0430\u0440\u0438\u0430\u043D\u0442 \u043F\u0440\u043E\u0435\u043A\u0442\u0430 (\u0431\u0430\u0437\u043E\u0432\u044B\u0439, \u043E\u043F\u0442\u0438\u043C\u0438\u0441\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439, \u043F\u0435\u0441\u0441\u0438\u043C\u0438\u0441\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439, \u0440\u0430\u0437\u043D\u043E\u0441\u0442\u043D\u044B\u0439)")), /* @__PURE__ */ React.createElement(Button, {
         variant: "outline-secondary",
         size: "sm",
         type: "submit"
@@ -950,28 +962,97 @@
     }
     return null;
   }
+  function RecordsFilter() {
+    const loading = instanceReactRedux.useSelector((state) => state.loading);
+    const showrecordslistStatus = instanceReactRedux.useSelector((state) => {
+      var _a2;
+      return (_a2 = state.caseLayout.find((item) => item.id === "showrecordslist")) == null ? void 0 : _a2.status;
+    });
+    if (!!showrecordslistStatus && !loading) {
+      let setFilter = function(filter) {
+        console.log(filter);
+        setStoreObject("selectedFilter", filter);
+      };
+      return /* @__PURE__ */ React.createElement(Container, null, /* @__PURE__ */ React.createElement(DropdownButton, {
+        id: "dropdown-item-button",
+        title: "\u0424\u0438\u043B\u044C\u0442\u0440 \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0439",
+        className: "m-3"
+      }, /* @__PURE__ */ React.createElement(Dropdown.ItemText, null, "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0444\u0438\u043B\u044C\u0442\u0440"), /* @__PURE__ */ React.createElement(Dropdown.Item, {
+        as: "button",
+        onClick: () => setFilter("allrecords")
+      }, "\u0412\u0441\u0435 \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0438"), /* @__PURE__ */ React.createElement(Dropdown.Item, {
+        as: "button",
+        onClick: () => setFilter("profits")
+      }, "\u0414\u043E\u0445\u043E\u0434\u044B, \u0440\u0430\u0441\u0445\u043E\u0434\u044B, \u043F\u0440\u0438\u0431\u044B\u043B\u044C"), /* @__PURE__ */ React.createElement(Dropdown.Item, {
+        as: "button",
+        onClick: () => setFilter("cashflows")
+      }, "\u0414\u0435\u043D\u044C\u0433\u0438"), /* @__PURE__ */ React.createElement(Dropdown.Item, {
+        as: "button",
+        onClick: () => setFilter("costs")
+      }, "\u0417\u0430\u0442\u0440\u0430\u0442\u044B"), /* @__PURE__ */ React.createElement(Dropdown.Item, {
+        as: "button",
+        onClick: () => setFilter("accountsreceivable")
+      }, "\u0414\u0435\u0431\u0438\u0442\u043E\u0440\u0441\u043A\u0430\u044F \u0437\u0430\u0434\u043E\u043B\u0436\u0435\u043D\u043D\u043E\u0441\u0442\u044C"), /* @__PURE__ */ React.createElement(Dropdown.Item, {
+        as: "button",
+        onClick: () => setFilter("accountspayable")
+      }, "\u041A\u0440\u0435\u0434\u0438\u0442\u043E\u0440\u0441\u043A\u0430\u044F \u0437\u0430\u0434\u043E\u043B\u0436\u0435\u043D\u043D\u043E\u0441\u0442\u044C")));
+    }
+    return null;
+  }
   function RecordsList() {
     const loading = instanceReactRedux.useSelector((state) => state.loading);
-    const showbalancestackedbars = instanceReactRedux.useSelector((state) => {
+    const showrecordslistStatus = instanceReactRedux.useSelector((state) => {
       var _a2;
-      return (_a2 = state.caseLayout.find((item) => item.id === "showbalancestackedbars")) == null ? void 0 : _a2.status;
+      return (_a2 = state.caseLayout.find((item) => item.id === "showrecordslist")) == null ? void 0 : _a2.status;
     });
+    const selectedFilter = instanceReactRedux.useSelector((state) => state.selectedFilter);
     const caseRecords = instanceReactRedux.useSelector((state) => state.caseArray);
-    const filteredCaseArray = instanceReactRedux.useSelector((state) => state.filteredCaseArray);
-    if (!loading) {
+    if (!!showrecordslistStatus && !loading) {
+      let filteredCaseRecords = [];
+      switch (selectedFilter) {
+        case null:
+          filteredCaseRecords = caseRecords;
+          break;
+        case "allrecords":
+          filteredCaseRecords = caseRecords;
+          break;
+        case "profits":
+          filteredCaseRecords = caseRecords.filter((item) => item.d === "\u041D\u0435\u0440\u0430\u0441\u043F\u0440\u0435\u0434\u0435\u043B\u0435\u043D\u043D\u0430\u044F \u043F\u0440\u0438\u0431\u044B\u043B\u044C" || item.k === "\u041D\u0435\u0440\u0430\u0441\u043F\u0440\u0435\u0434\u0435\u043B\u0435\u043D\u043D\u0430\u044F \u043F\u0440\u0438\u0431\u044B\u043B\u044C");
+          break;
+        case "cashflows":
+          filteredCaseRecords = caseRecords.filter((item) => item.d === "\u0414\u0435\u043D\u044C\u0433\u0438" || item.k === "\u0414\u0435\u043D\u044C\u0433\u0438");
+          break;
+        case "costs":
+          filteredCaseRecords = caseRecords.filter((item) => item.d === "\u041D\u0435\u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u043D\u043E\u0435 \u043F\u0440\u043E\u0438\u0437\u0432\u043E\u0434\u0441\u0442\u0432\u043E" || item.k === "\u041D\u0435\u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u043D\u043E\u0435 \u043F\u0440\u043E\u0438\u0437\u0432\u043E\u0434\u0441\u0442\u0432\u043E");
+          break;
+        case "accountsreceivable":
+          filteredCaseRecords = caseRecords.filter((item) => item.d === "\u0414\u0435\u0431\u0438\u0442\u043E\u0440\u0441\u043A\u0430\u044F \u0437\u0430\u0434\u043E\u043B\u0436\u0435\u043D\u043D\u043E\u0441\u0442\u044C" || item.k === "\u0414\u0435\u0431\u0438\u0442\u043E\u0440\u0441\u043A\u0430\u044F \u0437\u0430\u0434\u043E\u043B\u0436\u0435\u043D\u043D\u043E\u0441\u0442\u044C");
+          break;
+        case "accountspayable":
+          filteredCaseRecords = caseRecords.filter((item) => item.d === "\u041A\u0440\u0435\u0434\u0438\u0442\u043E\u0440\u0441\u043A\u0430\u044F \u0437\u0430\u0434\u043E\u043B\u0436\u0435\u043D\u043D\u043E\u0441\u0442\u044C" || item.k === "\u041A\u0440\u0435\u0434\u0438\u0442\u043E\u0440\u0441\u043A\u0430\u044F \u0437\u0430\u0434\u043E\u043B\u0436\u0435\u043D\u043D\u043E\u0441\u0442\u044C");
+          break;
+        default:
+          filteredCaseRecords = caseRecords;
+      }
       return /* @__PURE__ */ React.createElement("div", {
         className: "container mb-5 animated fadeIn"
-      }, caseRecords.map((row, index) => /* @__PURE__ */ React.createElement(Row, {
-        key: index
-      }, /* @__PURE__ */ React.createElement(Col, {
-        xs: 2
-      }, /* @__PURE__ */ React.createElement("small", null, row.period)), /* @__PURE__ */ React.createElement(Col, {
-        xs: 3
-      }, /* @__PURE__ */ React.createElement("small", null, row.d)), /* @__PURE__ */ React.createElement(Col, {
-        xs: 3
-      }, /* @__PURE__ */ React.createElement("small", null, row.k)), /* @__PURE__ */ React.createElement(Col, {
-        xs: 4
-      }, /* @__PURE__ */ React.createElement("small", null, row.sum), !!(row == null ? void 0 : row.type) ? /* @__PURE__ */ React.createElement("small", null, " " + row.type) : /* @__PURE__ */ React.createElement("small", null, " ")))));
+      }, /* @__PURE__ */ React.createElement("div", {
+        className: "table adaptive mt-3 mb-3"
+      }, /* @__PURE__ */ React.createElement("table", null, /* @__PURE__ */ React.createElement("thead", null, /* @__PURE__ */ React.createElement("tr", null, /* @__PURE__ */ React.createElement("th", null, "\u041F\u0435\u0440\u0438\u043E\u0434"), /* @__PURE__ */ React.createElement("th", null, "\u0414"), /* @__PURE__ */ React.createElement("th", null, "\u041A"), /* @__PURE__ */ React.createElement("th", null, "\u0421\u0443\u043C\u043C\u0430"), /* @__PURE__ */ React.createElement("th", null, "\u0422\u0438\u043F"))), /* @__PURE__ */ React.createElement("tbody", null, filteredCaseRecords.map(
+        (row, index) => /* @__PURE__ */ React.createElement("tr", {
+          key: index
+        }, /* @__PURE__ */ React.createElement("td", {
+          "data-label": "\u041F\u0435\u0440\u0438\u043E\u0434"
+        }, row.period), /* @__PURE__ */ React.createElement("td", {
+          "data-label": "\u0414"
+        }, row.d), /* @__PURE__ */ React.createElement("td", {
+          "data-label": "\u041A"
+        }, row.k), /* @__PURE__ */ React.createElement("td", {
+          "data-label": "\u0421\u0443\u043C\u043C\u0430"
+        }, row.sum), !!(row == null ? void 0 : row.type) ? /* @__PURE__ */ React.createElement("td", {
+          "data-label": "\u0422\u0438\u043F"
+        }, row.type) : null)
+      )))));
     }
     return null;
   }
@@ -1204,6 +1285,6 @@
   var root = ReactDOM.createRoot(container);
   root.render(/* @__PURE__ */ React.createElement(instanceReactRedux.Provider, {
     store
-  }, /* @__PURE__ */ React.createElement(BlogNavBar, null), /* @__PURE__ */ React.createElement(Login, null), /* @__PURE__ */ React.createElement(SelectCase, null), /* @__PURE__ */ React.createElement(AccountingNavBar, null), /* @__PURE__ */ React.createElement(ShowBalance, null), /* @__PURE__ */ React.createElement(ShowBalanceStackedBars, null), /* @__PURE__ */ React.createElement(ShowFinancialResults, null), /* @__PURE__ */ React.createElement(ShowCashFlow, null), /* @__PURE__ */ React.createElement(AccountingMachine, null), /* @__PURE__ */ React.createElement(RecordsList, null), /* @__PURE__ */ React.createElement(CreateCase, null)));
+  }, /* @__PURE__ */ React.createElement(BlogNavBar, null), /* @__PURE__ */ React.createElement(Login, null), /* @__PURE__ */ React.createElement(SelectCase, null), /* @__PURE__ */ React.createElement(AccountingNavBar, null), /* @__PURE__ */ React.createElement(ShowBalance, null), /* @__PURE__ */ React.createElement(ShowBalanceStackedBars, null), /* @__PURE__ */ React.createElement(ShowFinancialResults, null), /* @__PURE__ */ React.createElement(ShowCashFlow, null), /* @__PURE__ */ React.createElement(AccountingMachine, null), /* @__PURE__ */ React.createElement(RecordsFilter, null), /* @__PURE__ */ React.createElement(RecordsList, null), /* @__PURE__ */ React.createElement(CreateCase, null)));
 })();
 //# sourceMappingURL=index.js.map
