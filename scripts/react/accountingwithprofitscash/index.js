@@ -347,6 +347,15 @@
       }
     });
   }
+  function pushItemToArray(destination, item) {
+    store.dispatch({
+      type: "PUSH_ITEM_TO_ARRAY",
+      payload: {
+        arrayName: destination,
+        item
+      }
+    });
+  }
   function asyncSeedStoreArray(destination, items, delay = 275) {
     return __async(this, null, function* () {
       const d = yield new Promise((resolve) => {
@@ -836,7 +845,7 @@
     if (showselectcaseStatus) {
       let doSelect = function(item) {
         setStoreObject("selectedCase", item);
-        seedStoreArray("caseArray", !!(item == null ? void 0 : item.content) ? item.content : []);
+        seedStoreArray("caseArray", !!(item == null ? void 0 : item.content) && Array.isArray(item.content) ? item.content : []);
       };
       return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(Container, null, casesArray.map(
         (item) => /* @__PURE__ */ React.createElement(Row, {
@@ -1185,13 +1194,17 @@
       return (_a2 = state.caseLayout.find((item) => item.id === "showaccountingmachine")) == null ? void 0 : _a2.status;
     });
     const selectedCase = instanceReactRedux.useSelector((state) => state.selectedCase);
+    const caseArray = instanceReactRedux.useSelector((state) => state.caseArray);
     const loading = instanceReactRedux.useSelector((state) => state.loading);
     const periods = instanceReactRedux.useSelector((state) => state.casePeriods);
     const { register, handleSubmit, reset, watch, formState: { errors } } = useForm();
     if (showaccountingmachine && !loading) {
       const onSubmit = (bookentry) => {
+        pushItemToArray("caseArray", bookentry);
+        let newContent = [...caseArray, bookentry];
+        console.log(newContent);
         updateAccountingWithProfitsCashProject(dbRef, __spreadProps(__spreadValues({}, selectedCase), {
-          content: !!(selectedCase == null ? void 0 : selectedCase.content) && Array.isArray(selectedCase.content) && selectedCase.content.length > 0 ? [...selectedCase.content, bookentry] : [bookentry]
+          content: newContent
         }), userEmail).then(() => reset({ period: "...", d: "...", k: "...", sum: 0 }));
       };
       const capitalIncrease = watch("k") === "\u041D\u0435\u0440\u0430\u0441\u043F\u0440\u0435\u0434\u0435\u043B\u0435\u043D\u043D\u0430\u044F \u043F\u0440\u0438\u0431\u044B\u043B\u044C" ? true : false;
