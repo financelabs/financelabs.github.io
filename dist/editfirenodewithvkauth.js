@@ -1,456 +1,552 @@
-var tt = Object.defineProperty;
-var nt = (e, n, t) => n in e ? tt(e, n, { enumerable: !0, configurable: !0, writable: !0, value: t }) : e[n] = t;
-var _ = (e, n, t) => nt(e, typeof n != "symbol" ? n + "" : n, t);
-class ot {
-  constructor() {
-    _(this, "promise");
-    _(this, "callback");
-    _(this, "resolve");
-    _(this, "reject");
-    _(this, "setCallback", (n) => {
-      this.callback = n;
+var Se = Object.defineProperty;
+var ye = (t, e, n) => e in t ? Se(t, e, { enumerable: !0, configurable: !0, writable: !0, value: n }) : t[e] = n;
+var u = (t, e, n) => ye(t, typeof e != "symbol" ? e + "" : e, n);
+function Ee(t, e) {
+  var n = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : window, o, i, s = function() {
+    return t.apply(n, i);
+  };
+  return function() {
+    for (var d = arguments.length, h = new Array(d), p = 0; p < d; p++)
+      h[p] = arguments[p];
+    i = h, clearTimeout(o), o = setTimeout(s, e);
+  };
+}
+function tt(t) {
+  "@babel/helpers - typeof";
+  return tt = typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? function(e) {
+    return typeof e;
+  } : function(e) {
+    return e && typeof Symbol == "function" && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e;
+  }, tt(t);
+}
+function Ie(t, e) {
+  if (tt(t) !== "object" || t === null) return t;
+  var n = t[Symbol.toPrimitive];
+  if (n !== void 0) {
+    var o = n.call(t, e || "default");
+    if (tt(o) !== "object") return o;
+    throw new TypeError("@@toPrimitive must return a primitive value.");
+  }
+  return (e === "string" ? String : Number)(t);
+}
+function ke(t) {
+  var e = Ie(t, "string");
+  return tt(e) === "symbol" ? e : String(e);
+}
+function Ae(t, e, n) {
+  return e = ke(e), e in t ? Object.defineProperty(t, e, {
+    value: n,
+    enumerable: !0,
+    configurable: !0,
+    writable: !0
+  }) : t[e] = n, t;
+}
+function Bt(t, e) {
+  var n = Object.keys(t);
+  if (Object.getOwnPropertySymbols) {
+    var o = Object.getOwnPropertySymbols(t);
+    e && (o = o.filter(function(i) {
+      return Object.getOwnPropertyDescriptor(t, i).enumerable;
+    })), n.push.apply(n, o);
+  }
+  return n;
+}
+function Ce(t) {
+  for (var e = 1; e < arguments.length; e++) {
+    var n = arguments[e] != null ? arguments[e] : {};
+    e % 2 ? Bt(Object(n), !0).forEach(function(o) {
+      Ae(t, o, n[o]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(t, Object.getOwnPropertyDescriptors(n)) : Bt(Object(n)).forEach(function(o) {
+      Object.defineProperty(t, o, Object.getOwnPropertyDescriptor(n, o));
     });
-    _(this, "removeCallback", () => {
+  }
+  return t;
+}
+function we(t) {
+  if (typeof t != "string")
+    return {};
+  if (t = t.trim().replace(/^[?#&]/, ""), !t)
+    return {};
+  var e = /\?(.+)$/ig.exec(t), n = e ? e[1] : t;
+  return n.split("&").reduce(function(o, i) {
+    var s = i.split("=");
+    return s[1] && (o[s[0]] = decodeURIComponent(s[1])), o;
+  }, {});
+}
+function Te(t) {
+  var e = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+  if (tt(t) !== "object" || t === null)
+    return "";
+  e = Ce({
+    encode: !0
+  }, e);
+  var n = function(i) {
+    return e.encode ? encodeURIComponent(i) : String(i);
+  };
+  return Object.keys(t).reduce(function(o, i) {
+    var s = t[i];
+    return s === void 0 ? o : s === null ? (e.skipNull || o.push([n(i), ""].join("=")), o) : Array.isArray(s) ? (s.map(function(d) {
+      o.push("".concat(n(i), "[]=").concat(n(d)));
+    }).join(), o) : (o.push([n(i), n(s)].join("=")), o);
+  }, []).join("&");
+}
+var Y = {
+  parse: we,
+  stringify: Te
+}, gt;
+(function(t) {
+  t.TYPE_ACTION = "type_action";
+})(gt || (gt = {}));
+var et;
+(function(t) {
+  t.TYPE_REGISTRATION_ITEM = "type_registration_item", t.TYPE_SAK_SESSION_EVENT_ITEM = "type_sak_sessions_event_item";
+})(et || (et = {}));
+var N;
+(function(t) {
+  t.NOWHERE = "nowhere", t.FLOATING_ONE_TAP = "floating_one_tap", t.MULTIBRANDING = "multibranding_widget";
+})(N || (N = {}));
+class Et {
+  constructor(e) {
+    u(this, "actionStatsCollector");
+    this.actionStatsCollector = e;
+  }
+  logEvent(e, n) {
+    const o = {
+      type: et.TYPE_REGISTRATION_ITEM,
+      [et.TYPE_REGISTRATION_ITEM]: n
+    };
+    return this.actionStatsCollector.logEvent({
+      screen: e,
+      event: o
+    });
+  }
+}
+const Qt = "2.0.0", Nt = "vk.com", Oe = `login.${Nt}`, Re = `oauth.${Nt}`, Ve = `id.${Nt}`, xe = 9e5, $e = (t, e) => {
+  const { __vkidDomain: n, app: o } = e.get();
+  return `https://${n}/${t}?app_id=${o}&v=5.207`;
+}, Ne = (t) => Object.keys(t).map((n) => {
+  let o = t[n];
+  return n = encodeURIComponent(n || ""), o = encodeURIComponent(o === void 0 ? "" : o), `${n}=${o}`;
+}).join("&"), Le = (t, e) => {
+  const n = Ne(e);
+  return fetch(t, {
+    method: "POST",
+    body: n,
+    mode: "cors",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+  }).then((o) => o.json());
+}, yt = class yt {
+  constructor(e) {
+    u(this, "timeoutId", null);
+    u(this, "lastEvent");
+    u(this, "config");
+    u(this, "stackEvents", []);
+    this.config = e;
+  }
+  getIntId() {
+    return Math.floor(Math.random() * yt.MAX_INT32);
+  }
+  getCurrentTime(e = !0) {
+    const n = Date.now().toString(10);
+    return e ? n + "000" : n;
+  }
+  sendStats(e) {
+    return this.stackEvents.push(e), this.timeoutId && window.clearTimeout(this.timeoutId), new Promise((n, o) => {
+      this.timeoutId = window.setTimeout(() => {
+        const i = {
+          events: JSON.stringify(this.stackEvents),
+          sak_version: Qt
+        };
+        this.stackEvents = [];
+        const s = $e("stat_events_vkid_sdk", this.config);
+        Le(s, i).then(n).catch(o);
+      }, 0);
+    });
+  }
+  getBaseEvent(e) {
+    var n;
+    return {
+      id: this.getIntId(),
+      prev_event_id: ((n = this.lastEvent) == null ? void 0 : n.id) || 0,
+      prev_nav_id: 0,
+      timestamp: this.getCurrentTime(),
+      url: window.location.href,
+      screen: e
+    };
+  }
+  logEvent(e) {
+    return this.lastEvent = e, this.sendStats(e);
+  }
+};
+u(yt, "MAX_INT32", 2147483647);
+let q = yt;
+class ht {
+  constructor(e) {
+    u(this, "productStatsCollector");
+    this.productStatsCollector = e;
+  }
+  logEvent(e) {
+    const n = {
+      ...this.productStatsCollector.getBaseEvent(e.screen),
+      type: gt.TYPE_ACTION,
+      [gt.TYPE_ACTION]: e.event
+    };
+    return this.productStatsCollector.logEvent(n);
+  }
+}
+class De {
+  constructor(e) {
+    u(this, "registrationStatsCollector");
+    u(this, "uniqueSessionId");
+    const n = new q(e), o = new ht(n);
+    this.registrationStatsCollector = new Et(o);
+  }
+  setUniqueSessionId(e) {
+    this.uniqueSessionId = e;
+  }
+  getFields() {
+    const e = [
+      {
+        name: "sdk_type",
+        value: "vkid"
+      }
+    ];
+    return this.uniqueSessionId && e.push({
+      name: "unique_session_id",
+      value: this.uniqueSessionId
+    }), e;
+  }
+  sendCustomAuthStart(e) {
+    const n = this.getFields();
+    return e && n.push({
+      name: "oauth_service",
+      value: e
+    }), this.registrationStatsCollector.logEvent(N.NOWHERE, {
+      event_type: "custom_auth_start",
+      fields: n
+    });
+  }
+}
+class Me {
+  constructor() {
+    u(this, "promise");
+    u(this, "callback");
+    u(this, "resolve");
+    u(this, "reject");
+    u(this, "setCallback", (e) => {
+      this.callback = e;
+    });
+    u(this, "removeCallback", () => {
       this.callback = null;
     });
-    _(this, "sendSuccess", (n) => {
-      this.resolve(n), this.callback && this.callback();
+    u(this, "sendSuccess", (e) => {
+      this.resolve(e), this.callback && this.callback();
     });
-    _(this, "sendError", (n) => {
-      this.reject(n), this.callback && this.callback();
+    u(this, "sendError", (e) => {
+      this.reject(e), this.callback && this.callback();
     });
-    this.promise = new Promise((n, t) => {
-      this.resolve = n, this.reject = t;
+    this.promise = new Promise((e, n) => {
+      this.resolve = e, this.reject = n;
     });
   }
   get value() {
     return this.promise;
   }
 }
-var O;
-(function(e) {
-  e[e.EventNotSupported = 100] = "EventNotSupported", e[e.CannotCreateNewTab = 101] = "CannotCreateNewTab", e[e.NewTabHasBeenClosed = 102] = "NewTabHasBeenClosed", e[e.AuthorizationFailed = 103] = "AuthorizationFailed";
-})(O || (O = {}));
-const rt = "silent_token", se = {
-  [O.EventNotSupported]: "Event is not supported",
-  [O.CannotCreateNewTab]: "Cannot create new tab. Try checking your browser settings",
-  [O.NewTabHasBeenClosed]: "New tab has been closed",
-  [O.AuthorizationFailed]: "Authorization failed with an error"
-}, it = "vk_connect_response";
-class st extends ot {
+let Ue = "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict", Be = (t, e = 21) => (n = e) => {
+  let o = "", i = n;
+  for (; i--; )
+    o += t[Math.random() * t.length | 0];
+  return o;
+}, Ke = (t = 21) => {
+  let e = "", n = t;
+  for (; n--; )
+    e += Ue[Math.random() * 64 | 0];
+  return e;
+};
+function Pe(t) {
+  try {
+    let e = document.cookie.match(new RegExp("(?:^|; )" + ("vkid_sdk:" + t).replace(/([.$?*|{}()\[\]\\\/+^])/g, "\\$1") + "=([^;]*)"));
+    return e ? decodeURIComponent(e[1]) : void 0;
+  } catch {
+    return;
+  }
+}
+function Kt(t, e) {
+  try {
+    const n = new Date((/* @__PURE__ */ new Date()).getTime() + (e.expires || xe)).toUTCString(), o = location.host.split(".").slice(-2).join(".");
+    document.cookie = [
+      `vkid_sdk:${t}=${encodeURIComponent(e.value || "")}`,
+      `expires=${n}`,
+      "path=/",
+      `domain=.${o}`,
+      "SameSite=Strict",
+      "Secure"
+    ].join("; ");
+  } catch {
+  }
+}
+function te(t) {
+  const e = location.host.split(".").slice(-2).join(".");
+  try {
+    document.cookie = [
+      `vkid_sdk:${t}=`,
+      "expires=Thu, 01 Jan 1970 00:00:00 UTC",
+      "path=/",
+      "SameSite=Strict",
+      "Secure",
+      `domain=.${e}`
+    ].join("; ");
+  } catch {
+  }
+}
+function ee(t, e) {
+  if (e.value)
+    return Kt(t, e), e.value;
+  let n;
+  return n = Pe(t), n || (n = Ke(), Kt(t, {
+    ...e,
+    value: n
+  })), n;
+}
+const K = (t) => ee("state", {
+  value: t
+}), At = (t) => ee("codeVerifier", {
+  value: t
+}), Pt = () => te("state"), He = () => te("codeVerifier");
+var P;
+(function(t) {
+  t.AUTH = "from_custom_auth", t.BUTTON_ONE_TAP = "from_one_tap", t.FLOATING_ONE_TAP = "from_floating_one_tap", t.MULTIBRANDING = "from_multibranding";
+})(P || (P = {}));
+var V;
+(function(t) {
+  t[t.EventNotSupported = 100] = "EventNotSupported", t[t.CannotCreateNewTab = 101] = "CannotCreateNewTab", t[t.NewTabHasBeenClosed = 102] = "NewTabHasBeenClosed", t[t.AuthorizationFailed = 103] = "AuthorizationFailed", t[t.StateMismatch = 104] = "StateMismatch";
+})(V || (V = {}));
+const Fe = "code", X = {
+  [V.EventNotSupported]: "Event is not supported",
+  [V.CannotCreateNewTab]: "Cannot create new tab. Try checking your browser settings",
+  [V.NewTabHasBeenClosed]: "New tab has been closed",
+  [V.AuthorizationFailed]: "Authorization failed with an error",
+  [V.StateMismatch]: "The received state does not match the expected state"
+}, We = "oauth2_authorize_response";
+class ze extends Me {
   constructor() {
     super(...arguments);
-    // TODO: Типизировать payload
-    _(this, "sendSuccessData", (t) => {
+    u(this, "state", K());
+    u(this, "sendSuccessData", (n) => {
       this.sendSuccess({
-        type: t.type,
-        token: t.token,
-        ttl: t.ttl
+        type: n.type,
+        code: n.code,
+        state: n.state,
+        device_id: n.device_id
       });
     });
-    _(this, "sendNewTabHasBeenClosed", () => {
+    u(this, "sendNewTabHasBeenClosed", () => {
       this.sendError({
-        code: O.NewTabHasBeenClosed,
-        text: se[O.NewTabHasBeenClosed]
+        code: V.NewTabHasBeenClosed,
+        error: X[V.NewTabHasBeenClosed],
+        state: this.state
       });
     });
     // TODO: Типизировать details
-    _(this, "sendAuthorizationFailed", (t) => {
+    u(this, "sendAuthorizationFailed", (n) => {
       this.sendError({
-        code: O.AuthorizationFailed,
-        text: se[O.AuthorizationFailed],
-        details: t
+        code: V.AuthorizationFailed,
+        error: X[V.AuthorizationFailed],
+        error_description: JSON.stringify(n),
+        state: this.state
       });
     });
-    _(this, "sendEventNotSupported", () => {
+    u(this, "sendEventNotSupported", () => {
       this.sendError({
-        code: O.EventNotSupported,
-        text: se[O.EventNotSupported]
+        code: V.EventNotSupported,
+        error: X[V.EventNotSupported],
+        state: this.state
       });
     });
-    _(this, "sendCannotCreateNewTab", () => {
+    u(this, "sendCannotCreateNewTab", () => {
       this.sendError({
-        code: O.CannotCreateNewTab,
-        text: se[O.CannotCreateNewTab]
+        code: V.CannotCreateNewTab,
+        error: X[V.CannotCreateNewTab],
+        state: this.state
+      });
+    });
+    u(this, "sendStateMismatchError", () => {
+      this.sendError({
+        code: V.StateMismatch,
+        error: X[V.StateMismatch],
+        state: this.state
       });
     });
   }
 }
-var Q;
-(function(e) {
-  e.Redirect = "redirect", e.InNewTab = "new_tab";
-})(Q || (Q = {}));
-const at = [
-  "vk.com",
-  "vk.ru"
-], ct = (e) => !!at.find((n) => e.endsWith(n));
-function lt(e, n) {
-  var t = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : window, o, r, s = function() {
-    return e.apply(t, r);
-  };
-  return function() {
-    for (var u = arguments.length, h = new Array(u), v = 0; v < u; v++)
-      h[v] = arguments[v];
-    r = h, clearTimeout(o), o = setTimeout(s, n);
-  };
-}
-function z(e) {
-  "@babel/helpers - typeof";
-  return z = typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? function(n) {
-    return typeof n;
-  } : function(n) {
-    return n && typeof Symbol == "function" && n.constructor === Symbol && n !== Symbol.prototype ? "symbol" : typeof n;
-  }, z(e);
-}
-function dt(e, n) {
-  if (z(e) !== "object" || e === null) return e;
-  var t = e[Symbol.toPrimitive];
-  if (t !== void 0) {
-    var o = t.call(e, n || "default");
-    if (z(o) !== "object") return o;
-    throw new TypeError("@@toPrimitive must return a primitive value.");
+class Ge {
+  constructor(e) {
+    u(this, "actionStatsCollector");
+    this.actionStatsCollector = e;
   }
-  return (n === "string" ? String : Number)(e);
-}
-function ut(e) {
-  var n = dt(e, "string");
-  return z(n) === "symbol" ? n : String(n);
-}
-function ht(e, n, t) {
-  return n = ut(n), n in e ? Object.defineProperty(e, n, {
-    value: t,
-    enumerable: !0,
-    configurable: !0,
-    writable: !0
-  }) : e[n] = t, e;
-}
-function we(e, n) {
-  var t = Object.keys(e);
-  if (Object.getOwnPropertySymbols) {
-    var o = Object.getOwnPropertySymbols(e);
-    n && (o = o.filter(function(r) {
-      return Object.getOwnPropertyDescriptor(e, r).enumerable;
-    })), t.push.apply(t, o);
-  }
-  return t;
-}
-function ft(e) {
-  for (var n = 1; n < arguments.length; n++) {
-    var t = arguments[n] != null ? arguments[n] : {};
-    n % 2 ? we(Object(t), !0).forEach(function(o) {
-      ht(e, o, t[o]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : we(Object(t)).forEach(function(o) {
-      Object.defineProperty(e, o, Object.getOwnPropertyDescriptor(t, o));
+  logEvent(e) {
+    const n = {
+      type: et.TYPE_SAK_SESSION_EVENT_ITEM,
+      [et.TYPE_SAK_SESSION_EVENT_ITEM]: e
+    };
+    return this.actionStatsCollector.logEvent({
+      screen: N.NOWHERE,
+      event: n
     });
   }
-  return e;
+  sendSdkInit() {
+    this.logEvent({
+      step: "vkid_sdk_init"
+    });
+  }
 }
-function _t(e) {
-  if (typeof e != "string")
-    return {};
-  if (e = e.trim().replace(/^[?#&]/, ""), !e)
-    return {};
-  var n = /\?(.+)$/ig.exec(e), t = n ? n[1] : e;
-  return t.split("&").reduce(function(o, r) {
-    var s = r.split("=");
-    return s[1] && (o[s[0]] = decodeURIComponent(s[1])), o;
-  }, {});
-}
-function pt(e) {
-  var n = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
-  if (z(e) !== "object" || e === null)
-    return "";
-  n = ft({
-    encode: !0
-  }, n);
-  var t = function(r) {
-    return n.encode ? encodeURIComponent(r) : String(r);
+const ft = (t) => (e, n, o) => {
+  const i = o.value;
+  o.value = function(s) {
+    const d = Object.keys(t);
+    for (let h of d) {
+      const p = t[h];
+      p == null || p.forEach((a) => {
+        const { result: y, makeError: c } = a(s[h]);
+        if (!y)
+          throw new Error(c(h));
+      });
+    }
+    return i == null ? void 0 : i.apply(this, arguments);
   };
-  return Object.keys(e).reduce(function(o, r) {
-    var s = e[r];
-    return s === void 0 ? o : s === null ? (n.skipNull || o.push([t(r), ""].join("=")), o) : Array.isArray(s) ? (s.map(function(u) {
-      o.push("".concat(t(r), "[]=").concat(t(u)));
-    }).join(), o) : (o.push([t(r), t(s)].join("=")), o);
-  }, []).join("&");
+}, vt = (t) => {
+  let e = !0;
+  return (typeof t == "string" && t.trim() === "" || t === void 0 || t == null) && (e = !1), {
+    result: e,
+    makeError: (n) => `${n} is required parameter`
+  };
+}, ne = (t) => ({
+  result: [
+    "number",
+    "string"
+  ].includes(typeof t) && !isNaN(parseInt(t)),
+  makeError: (e) => `${e} should be number`
+}), je = (t) => ({
+  result: t !== void 0 && t.height !== void 0 && ne(t.height) && t.height < 57 && t.height > 31 || t === void 0 || t.height === void 0,
+  makeError: () => "The height should correspond to the range from 32 to 56"
+}), qe = (t) => ({
+  result: (t == null ? void 0 : t.length) && t.length >= 1,
+  makeError: () => "OAuth list can't be empty"
+});
+var ct;
+(function(t) {
+  t.Redirect = "redirect", t.InNewTab = "new_tab";
+})(ct || (ct = {}));
+var lt;
+(function(t) {
+  t.Default = "", t.None = "none", t.Login = "login", t.Consent = "consent", t.SelectAccount = "select_account";
+})(lt || (lt = {}));
+function Ze(t, e, n, o) {
+  var i = arguments.length, s = i < 3 ? e : o === null ? o = Object.getOwnPropertyDescriptor(e, n) : o, d;
+  if (typeof Reflect == "object" && typeof Reflect.decorate == "function") s = Reflect.decorate(t, e, n, o);
+  else for (var h = t.length - 1; h >= 0; h--) (d = t[h]) && (s = (i < 3 ? d(s) : i > 3 ? d(e, n, s) : d(e, n)) || s);
+  return i > 3 && s && Object.defineProperty(e, n, s), s;
 }
-var gt = {
-  parse: _t,
-  stringify: pt
-};
-const vt = "1.1.0", ye = "vk.com", bt = `login.${ye}`, mt = `oauth.${ye}`, yt = `id.${ye}`;
-let St = "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict", kt = (e, n = 21) => (t = n) => {
-  let o = "", r = t;
-  for (; r--; )
-    o += e[Math.random() * e.length | 0];
-  return o;
-}, Ct = (e = 21) => {
-  let n = "", t = e;
-  for (; t--; )
-    n += St[Math.random() * 64 | 0];
-  return n;
-};
-const Se = kt("qazwsxedcrfvtgbyhnujmikol", 6), Me = (e, n, t) => {
-  const o = {
-    ...n,
-    uuid: n.uuid || Se(),
-    v: vt,
-    sdk_type: "vkid",
-    app_id: t.app,
-    redirect_uri: t.redirectUrl,
-    redirect_state: t.state,
-    debug: t.__debug ? 1 : null,
-    localhost: t.__localhost ? 1 : null
-  }, r = gt.stringify(o, {
-    skipNull: !0
-  });
-  return `https://${t.__vkidDomain}/${e}?${r}`;
-}, He = (e, n) => {
-  let t = `${n.get().redirectUrl}?payload=${encodeURIComponent(JSON.stringify(e))}`;
-  return n.get().state && (t += `&state=${n.get().state}`), t;
-}, J = class J {
+class oe {
   constructor() {
-    _(this, "uuid");
-    _(this, "dataService");
-    _(this, "opener");
-    _(this, "interval");
-    _(this, "close", () => {
-      this.opener && this.opener.close();
-    });
-    _(this, "handleMessage", ({ origin: n, source: t, data: o }) => {
-      if (!(t !== this.opener || !this.opener || !ct(n))) {
-        if (this.unsubscribe(), o.payload.error) {
-          this.dataService.sendAuthorizationFailed(o.payload.error);
-          return;
-        }
-        if (o.action === it + this.uuid) {
-          this.dataService.sendSuccessData(o.payload);
-          return;
-        }
-        this.dataService.sendEventNotSupported();
-      }
-    });
-    _(this, "handleInterval", () => {
-      var n;
-      (n = this.opener) != null && n.closed && (this.unsubscribe(), this.dataService.sendNewTabHasBeenClosed());
-    });
-    _(this, "subscribe", () => {
-      this.interval = window.setInterval(this.handleInterval, 1e3), window.addEventListener("message", this.handleMessage), this.dataService.removeCallback();
-    });
-    _(this, "unsubscribe", () => {
-      window.removeEventListener("message", this.handleMessage), clearInterval(this.interval), this.dataService.setCallback(this.close);
-    });
-    _(this, "loginInNewTab", (n) => {
-      this.dataService = new st(), this.opener = window.open(n, "_blank"), this.opener ? this.subscribe() : this.dataService.sendCannotCreateNewTab(), this.dataService.value.then((t) => {
-        this.redirectWithPayload(t);
-      }).catch(console.error);
-    });
-    _(this, "loginByRedirect", (n) => {
-      location.assign(n);
-    });
-    _(this, "login", (n) => {
-      const t = J.__config.get();
-      this.uuid = Se();
-      const o = {
-        uuid: this.uuid,
-        lang_id: n == null ? void 0 : n.lang,
-        scheme: n == null ? void 0 : n.scheme,
-        screen: n == null ? void 0 : n.screen,
-        response_type: rt,
-        action: n != null && n.action ? btoa(JSON.stringify(n.action)) : void 0
-      }, r = () => Me("auth", o, t);
-      t.mode === Q.InNewTab ? (o.origin = location.protocol + "//" + location.hostname, this.loginInNewTab(r())) : this.loginByRedirect(r());
-    });
-  }
-  // TODO: добавить типы
-  redirectWithPayload(n) {
-    location.assign(He(n, J.__config));
-  }
-};
-/**
-* @ignore
-*/
-_(J, "__config");
-let ae = J;
-class Et {
-  constructor() {
-    _(this, "store", {
+    u(this, "sakSessionStatsCollector");
+    u(this, "store", {
       app: 0,
       redirectUrl: "",
-      mode: Q.Redirect,
-      __loginDomain: bt,
-      __oauthDomain: mt,
-      __vkidDomain: yt
+      mode: ct.InNewTab,
+      codeVerifier: "",
+      state: "",
+      prompt: [
+        lt.Default
+      ],
+      __loginDomain: Oe,
+      __oauthDomain: Re,
+      __vkidDomain: Ve
     });
+    const e = new q(this), n = new ht(e);
+    this.sakSessionStatsCollector = new Ge(n);
   }
-  set(n) {
+  init(e) {
+    return this.set(e), this.sakSessionStatsCollector.sendSdkInit(), this;
+  }
+  update(e) {
+    return this.set(e);
+  }
+  set(e) {
     return this.store = {
       ...this.store,
-      ...n
+      ...e
     }, this;
   }
   get() {
     return this.store;
   }
 }
-function wt(e) {
-  return e = e || /* @__PURE__ */ Object.create(null), {
-    /**
-     * Register an event handler for the given type.
-     *
-     * @param  {String} type	Type of event to listen for, or `"*"` for all events
-     * @param  {Function} handler Function to call in response to given event
-     * @memberOf mitt
-     */
-    on: function(t, o) {
-      (e[t] || (e[t] = [])).push(o);
-    },
-    /**
-     * Remove an event handler for the given type.
-     *
-     * @param  {String} type	Type of event to unregister `handler` from, or `"*"`
-     * @param  {Function} handler Handler function to remove
-     * @memberOf mitt
-     */
-    off: function(t, o) {
-      e[t] && e[t].splice(e[t].indexOf(o) >>> 0, 1);
-    },
-    /**
-     * Invoke all handlers for the given type.
-     * If present, `"*"` handlers are invoked after type-matched handlers.
-     *
-     * @param {String} type  The event type to invoke
-     * @param {Any} [evt]  Any value (object is recommended and powerful), passed to each handler
-     * @memberOf mitt
-     */
-    emit: function(t, o) {
-      (e[t] || []).slice().map(function(r) {
-        r(o);
-      }), (e["*"] || []).slice().map(function(r) {
-        r(t, o);
-      });
-    }
-  };
+Ze([
+  ft({
+    app: [
+      vt,
+      ne
+    ],
+    redirectUrl: [
+      vt
+    ]
+  })
+], oe.prototype, "init", null);
+const Ye = [
+  ".vk.com",
+  ".vk.ru"
+], Xe = (t) => !!Ye.find((e) => t.endsWith(e));
+var J = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {};
+function ie(t) {
+  return t && t.__esModule && Object.prototype.hasOwnProperty.call(t, "default") ? t.default : t;
 }
-class We {
-  constructor() {
-    _(this, "events", wt());
-  }
-  on(n, t) {
-    return this.events.on(n, t), this;
-  }
-  off(n, t) {
-    return this.events.off(n, t), this;
-  }
-}
-var ee;
-(function(e) {
-  e.MESSAGE = "message", e.UNSUPPORTED_MESSAGE = "unsupported_message";
-})(ee || (ee = {}));
-const Ae = "vk-sak-sdk";
-class At extends We {
-  constructor(t) {
-    super();
-    _(this, "config");
-    this.config = t, this.handleMessage = this.handleMessage.bind(this), window.addEventListener("message", this.handleMessage);
-  }
-  destroy() {
-    delete this.config, window.removeEventListener("message", this.handleMessage);
-  }
-  sendMessage(t) {
-    var o;
-    (o = this.config.iframe.contentWindow) == null || o.postMessage({
-      type: Ae,
-      ...t
-    }, this.config.origin);
-  }
-  handleMessage(t) {
-    var r;
-    if (!this.config.origin || t.origin !== this.config.origin || t.source !== this.config.iframe.contentWindow || ((r = t.data) == null ? void 0 : r.type) !== Ae) {
-      this.events.emit(ee.UNSUPPORTED_MESSAGE, t.data);
-      return;
-    }
-    this.events.emit(ee.MESSAGE, t.data);
-  }
-}
-const de = (e) => (n, t, o) => {
-  const r = o.value;
-  o.value = function(s) {
-    const u = Object.keys(e);
-    for (let h of u) {
-      const v = e[h];
-      v == null || v.forEach((a) => {
-        const { result: c, makeError: S } = a(s[h]);
-        if (!c)
-          throw new Error(S(h));
-      });
-    }
-    return r == null ? void 0 : r.apply(this, arguments);
-  };
-}, Pe = (e) => {
-  let n = !0;
-  return (typeof e == "string" && e.trim() === "" || e === void 0 || e == null) && (n = !1), {
-    result: n,
-    makeError: (t) => `${t} is required parameter`
-  };
-}, It = (e) => ({
-  result: [
-    "number",
-    "string"
-  ].includes(typeof e) && !isNaN(parseInt(e)),
-  makeError: (n) => `${n} should be number`
-}), Rt = (e) => ({
-  result: e !== void 0 && e.height !== void 0 && It(e.height) && e.height < 57 && e.height > 31 || e === void 0 || e.height === void 0,
-  makeError: () => "The height should correspond to the range from 32 to 56"
-}), xt = (e) => ({
-  result: (e == null ? void 0 : e.length) && e.length >= 1,
-  makeError: () => "OAuth list can't be empty"
-});
-var B = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {};
-function Ke(e) {
-  return e && e.__esModule && Object.prototype.hasOwnProperty.call(e, "default") ? e.default : e;
-}
-function Ot(e) {
-  if (e.__esModule) return e;
-  var n = e.default;
-  if (typeof n == "function") {
-    var t = function o() {
-      return this instanceof o ? Reflect.construct(n, arguments, this.constructor) : n.apply(this, arguments);
+function Je(t) {
+  if (t.__esModule) return t;
+  var e = t.default;
+  if (typeof e == "function") {
+    var n = function o() {
+      return this instanceof o ? Reflect.construct(e, arguments, this.constructor) : e.apply(this, arguments);
     };
-    t.prototype = n.prototype;
-  } else t = {};
-  return Object.defineProperty(t, "__esModule", { value: !0 }), Object.keys(e).forEach(function(o) {
-    var r = Object.getOwnPropertyDescriptor(e, o);
-    Object.defineProperty(t, o, r.get ? r : {
+    n.prototype = e.prototype;
+  } else n = {};
+  return Object.defineProperty(n, "__esModule", { value: !0 }), Object.keys(t).forEach(function(o) {
+    var i = Object.getOwnPropertyDescriptor(t, o);
+    Object.defineProperty(n, o, i.get ? i : {
       enumerable: !0,
       get: function() {
-        return e[o];
+        return t[o];
       }
     });
-  }), t;
+  }), n;
 }
-var Ue = { exports: {} };
-function Tt(e) {
-  throw new Error('Could not dynamically require "' + e + '". Please configure the dynamicRequireTargets or/and ignoreDynamicRequires option of @rollup/plugin-commonjs appropriately for this require call to work.');
+var re = { exports: {} };
+function Qe(t) {
+  throw new Error('Could not dynamically require "' + t + '". Please configure the dynamicRequireTargets or/and ignoreDynamicRequires option of @rollup/plugin-commonjs appropriately for this require call to work.');
 }
-var _e = { exports: {} };
-const $t = {}, Vt = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+var Ct = { exports: {} };
+const tn = {}, en = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: $t
-}, Symbol.toStringTag, { value: "Module" })), Lt = /* @__PURE__ */ Ot(Vt);
-var Ie;
-function Be() {
-  return Ie || (Ie = 1, function(e, n) {
-    (function(t, o) {
-      e.exports = o();
-    })(B, function() {
-      var t = t || function(o, r) {
+  default: tn
+}, Symbol.toStringTag, { value: "Module" })), nn = /* @__PURE__ */ Je(en);
+var Ht;
+function se() {
+  return Ht || (Ht = 1, function(t, e) {
+    (function(n, o) {
+      t.exports = o();
+    })(J, function() {
+      var n = n || function(o, i) {
         var s;
-        if (typeof window < "u" && window.crypto && (s = window.crypto), typeof self < "u" && self.crypto && (s = self.crypto), typeof globalThis < "u" && globalThis.crypto && (s = globalThis.crypto), !s && typeof window < "u" && window.msCrypto && (s = window.msCrypto), !s && typeof B < "u" && B.crypto && (s = B.crypto), !s && typeof Tt == "function")
+        if (typeof window < "u" && window.crypto && (s = window.crypto), typeof self < "u" && self.crypto && (s = self.crypto), typeof globalThis < "u" && globalThis.crypto && (s = globalThis.crypto), !s && typeof window < "u" && window.msCrypto && (s = window.msCrypto), !s && typeof J < "u" && J.crypto && (s = J.crypto), !s && typeof Qe == "function")
           try {
-            s = Lt;
+            s = nn;
           } catch {
           }
-        var u = function() {
+        var d = function() {
           if (s) {
             if (typeof s.getRandomValues == "function")
               try {
@@ -467,11 +563,11 @@ function Be() {
         }, h = Object.create || /* @__PURE__ */ function() {
           function l() {
           }
-          return function(d) {
-            var g;
-            return l.prototype = d, g = new l(), l.prototype = null, g;
+          return function(f) {
+            var v;
+            return l.prototype = f, v = new l(), l.prototype = null, v;
           };
-        }(), v = {}, a = v.lib = {}, c = a.Base = /* @__PURE__ */ function() {
+        }(), p = {}, a = p.lib = {}, y = a.Base = /* @__PURE__ */ function() {
           return {
             /**
              * Creates a new object that inherits from this object.
@@ -492,10 +588,10 @@ function Be() {
              *     });
              */
             extend: function(l) {
-              var d = h(this);
-              return l && d.mixIn(l), (!d.hasOwnProperty("init") || this.init === d.init) && (d.init = function() {
-                d.$super.init.apply(this, arguments);
-              }), d.init.prototype = d, d.$super = this, d;
+              var f = h(this);
+              return l && f.mixIn(l), (!f.hasOwnProperty("init") || this.init === f.init) && (f.init = function() {
+                f.$super.init.apply(this, arguments);
+              }), f.init.prototype = f, f.$super = this, f;
             },
             /**
              * Extends this object and runs the init method.
@@ -539,8 +635,8 @@ function Be() {
              *     });
              */
             mixIn: function(l) {
-              for (var d in l)
-                l.hasOwnProperty(d) && (this[d] = l[d]);
+              for (var f in l)
+                l.hasOwnProperty(f) && (this[f] = l[f]);
               l.hasOwnProperty("toString") && (this.toString = l.toString);
             },
             /**
@@ -556,7 +652,7 @@ function Be() {
               return this.init.prototype.extend(this);
             }
           };
-        }(), S = a.WordArray = c.extend({
+        }(), c = a.WordArray = y.extend({
           /**
            * Initializes a newly created word array.
            *
@@ -569,8 +665,8 @@ function Be() {
            *     var wordArray = CryptoJS.lib.WordArray.create([0x00010203, 0x04050607]);
            *     var wordArray = CryptoJS.lib.WordArray.create([0x00010203, 0x04050607], 6);
            */
-          init: function(l, d) {
-            l = this.words = l || [], d != r ? this.sigBytes = d : this.sigBytes = l.length * 4;
+          init: function(l, f) {
+            l = this.words = l || [], f != i ? this.sigBytes = f : this.sigBytes = l.length * 4;
           },
           /**
            * Converts this word array to a string.
@@ -586,7 +682,7 @@ function Be() {
            *     var string = wordArray.toString(CryptoJS.enc.Utf8);
            */
           toString: function(l) {
-            return (l || p).stringify(this);
+            return (l || g).stringify(this);
           },
           /**
            * Concatenates a word array to this word array.
@@ -600,16 +696,16 @@ function Be() {
            *     wordArray1.concat(wordArray2);
            */
           concat: function(l) {
-            var d = this.words, g = l.words, b = this.sigBytes, E = l.sigBytes;
-            if (this.clamp(), b % 4)
-              for (var k = 0; k < E; k++) {
-                var I = g[k >>> 2] >>> 24 - k % 4 * 8 & 255;
-                d[b + k >>> 2] |= I << 24 - (b + k) % 4 * 8;
+            var f = this.words, v = l.words, m = this.sigBytes, A = l.sigBytes;
+            if (this.clamp(), m % 4)
+              for (var E = 0; E < A; E++) {
+                var I = v[E >>> 2] >>> 24 - E % 4 * 8 & 255;
+                f[m + E >>> 2] |= I << 24 - (m + E) % 4 * 8;
               }
             else
-              for (var w = 0; w < E; w += 4)
-                d[b + w >>> 2] = g[w >>> 2];
-            return this.sigBytes += E, this;
+              for (var w = 0; w < A; w += 4)
+                f[m + w >>> 2] = v[w >>> 2];
+            return this.sigBytes += A, this;
           },
           /**
            * Removes insignificant bits.
@@ -619,8 +715,8 @@ function Be() {
            *     wordArray.clamp();
            */
           clamp: function() {
-            var l = this.words, d = this.sigBytes;
-            l[d >>> 2] &= 4294967295 << 32 - d % 4 * 8, l.length = o.ceil(d / 4);
+            var l = this.words, f = this.sigBytes;
+            l[f >>> 2] &= 4294967295 << 32 - f % 4 * 8, l.length = o.ceil(f / 4);
           },
           /**
            * Creates a copy of this word array.
@@ -632,7 +728,7 @@ function Be() {
            *     var clone = wordArray.clone();
            */
           clone: function() {
-            var l = c.clone.call(this);
+            var l = y.clone.call(this);
             return l.words = this.words.slice(0), l;
           },
           /**
@@ -649,11 +745,11 @@ function Be() {
            *     var wordArray = CryptoJS.lib.WordArray.random(16);
            */
           random: function(l) {
-            for (var d = [], g = 0; g < l; g += 4)
-              d.push(u());
-            return new S.init(d, l);
+            for (var f = [], v = 0; v < l; v += 4)
+              f.push(d());
+            return new c.init(f, l);
           }
-        }), m = v.enc = {}, p = m.Hex = {
+        }), b = p.enc = {}, g = b.Hex = {
           /**
            * Converts a word array to a hex string.
            *
@@ -668,11 +764,11 @@ function Be() {
            *     var hexString = CryptoJS.enc.Hex.stringify(wordArray);
            */
           stringify: function(l) {
-            for (var d = l.words, g = l.sigBytes, b = [], E = 0; E < g; E++) {
-              var k = d[E >>> 2] >>> 24 - E % 4 * 8 & 255;
-              b.push((k >>> 4).toString(16)), b.push((k & 15).toString(16));
+            for (var f = l.words, v = l.sigBytes, m = [], A = 0; A < v; A++) {
+              var E = f[A >>> 2] >>> 24 - A % 4 * 8 & 255;
+              m.push((E >>> 4).toString(16)), m.push((E & 15).toString(16));
             }
-            return b.join("");
+            return m.join("");
           },
           /**
            * Converts a hex string to a word array.
@@ -688,11 +784,11 @@ function Be() {
            *     var wordArray = CryptoJS.enc.Hex.parse(hexString);
            */
           parse: function(l) {
-            for (var d = l.length, g = [], b = 0; b < d; b += 2)
-              g[b >>> 3] |= parseInt(l.substr(b, 2), 16) << 24 - b % 8 * 4;
-            return new S.init(g, d / 2);
+            for (var f = l.length, v = [], m = 0; m < f; m += 2)
+              v[m >>> 3] |= parseInt(l.substr(m, 2), 16) << 24 - m % 8 * 4;
+            return new c.init(v, f / 2);
           }
-        }, C = m.Latin1 = {
+        }, k = b.Latin1 = {
           /**
            * Converts a word array to a Latin1 string.
            *
@@ -707,11 +803,11 @@ function Be() {
            *     var latin1String = CryptoJS.enc.Latin1.stringify(wordArray);
            */
           stringify: function(l) {
-            for (var d = l.words, g = l.sigBytes, b = [], E = 0; E < g; E++) {
-              var k = d[E >>> 2] >>> 24 - E % 4 * 8 & 255;
-              b.push(String.fromCharCode(k));
+            for (var f = l.words, v = l.sigBytes, m = [], A = 0; A < v; A++) {
+              var E = f[A >>> 2] >>> 24 - A % 4 * 8 & 255;
+              m.push(String.fromCharCode(E));
             }
-            return b.join("");
+            return m.join("");
           },
           /**
            * Converts a Latin1 string to a word array.
@@ -727,11 +823,11 @@ function Be() {
            *     var wordArray = CryptoJS.enc.Latin1.parse(latin1String);
            */
           parse: function(l) {
-            for (var d = l.length, g = [], b = 0; b < d; b++)
-              g[b >>> 2] |= (l.charCodeAt(b) & 255) << 24 - b % 4 * 8;
-            return new S.init(g, d);
+            for (var f = l.length, v = [], m = 0; m < f; m++)
+              v[m >>> 2] |= (l.charCodeAt(m) & 255) << 24 - m % 4 * 8;
+            return new c.init(v, f);
           }
-        }, f = m.Utf8 = {
+        }, _ = b.Utf8 = {
           /**
            * Converts a word array to a UTF-8 string.
            *
@@ -747,7 +843,7 @@ function Be() {
            */
           stringify: function(l) {
             try {
-              return decodeURIComponent(escape(C.stringify(l)));
+              return decodeURIComponent(escape(k.stringify(l)));
             } catch {
               throw new Error("Malformed UTF-8 data");
             }
@@ -766,9 +862,9 @@ function Be() {
            *     var wordArray = CryptoJS.enc.Utf8.parse(utf8String);
            */
           parse: function(l) {
-            return C.parse(unescape(encodeURIComponent(l)));
+            return k.parse(unescape(encodeURIComponent(l)));
           }
-        }, y = a.BufferedBlockAlgorithm = c.extend({
+        }, S = a.BufferedBlockAlgorithm = y.extend({
           /**
            * Resets this block algorithm's data buffer to its initial state.
            *
@@ -777,7 +873,7 @@ function Be() {
            *     bufferedBlockAlgorithm.reset();
            */
           reset: function() {
-            this._data = new S.init(), this._nDataBytes = 0;
+            this._data = new c.init(), this._nDataBytes = 0;
           },
           /**
            * Adds new data to this block algorithm's buffer.
@@ -790,7 +886,7 @@ function Be() {
            *     bufferedBlockAlgorithm._append(wordArray);
            */
           _append: function(l) {
-            typeof l == "string" && (l = f.parse(l)), this._data.concat(l), this._nDataBytes += l.sigBytes;
+            typeof l == "string" && (l = _.parse(l)), this._data.concat(l), this._nDataBytes += l.sigBytes;
           },
           /**
            * Processes available data blocks.
@@ -807,15 +903,15 @@ function Be() {
            *     var processedData = bufferedBlockAlgorithm._process(!!'flush');
            */
           _process: function(l) {
-            var d, g = this._data, b = g.words, E = g.sigBytes, k = this.blockSize, I = k * 4, w = E / I;
+            var f, v = this._data, m = v.words, A = v.sigBytes, E = this.blockSize, I = E * 4, w = A / I;
             l ? w = o.ceil(w) : w = o.max((w | 0) - this._minBufferSize, 0);
-            var T = w * k, A = o.min(T * 4, E);
-            if (T) {
-              for (var $ = 0; $ < T; $ += k)
-                this._doProcessBlock(b, $);
-              d = b.splice(0, T), g.sigBytes -= A;
+            var x = w * E, L = o.min(x * 4, A);
+            if (x) {
+              for (var T = 0; T < x; T += E)
+                this._doProcessBlock(m, T);
+              f = m.splice(0, x), v.sigBytes -= L;
             }
-            return new S.init(d, A);
+            return new c.init(f, L);
           },
           /**
            * Creates a copy of this object.
@@ -827,16 +923,16 @@ function Be() {
            *     var clone = bufferedBlockAlgorithm.clone();
            */
           clone: function() {
-            var l = c.clone.call(this);
+            var l = y.clone.call(this);
             return l._data = this._data.clone(), l;
           },
           _minBufferSize: 0
         });
-        a.Hasher = y.extend({
+        a.Hasher = S.extend({
           /**
            * Configuration options.
            */
-          cfg: c.extend(),
+          cfg: y.extend(),
           /**
            * Initializes a newly created hasher.
            *
@@ -857,7 +953,7 @@ function Be() {
            *     hasher.reset();
            */
           reset: function() {
-            y.reset.call(this), this._doReset();
+            S.reset.call(this), this._doReset();
           },
           /**
            * Updates this hasher with a message.
@@ -890,8 +986,8 @@ function Be() {
            */
           finalize: function(l) {
             l && this._append(l);
-            var d = this._doFinalize();
-            return d;
+            var f = this._doFinalize();
+            return f;
           },
           blockSize: 16,
           /**
@@ -908,8 +1004,8 @@ function Be() {
            *     var SHA256 = CryptoJS.lib.Hasher._createHelper(CryptoJS.algo.SHA256);
            */
           _createHelper: function(l) {
-            return function(d, g) {
-              return new l.init(g).finalize(d);
+            return function(f, v) {
+              return new l.init(v).finalize(f);
             };
           },
           /**
@@ -926,25 +1022,25 @@ function Be() {
            *     var HmacSHA256 = CryptoJS.lib.Hasher._createHmacHelper(CryptoJS.algo.SHA256);
            */
           _createHmacHelper: function(l) {
-            return function(d, g) {
-              return new R.HMAC.init(l, g).finalize(d);
+            return function(f, v) {
+              return new R.HMAC.init(l, v).finalize(f);
             };
           }
         });
-        var R = v.algo = {};
-        return v;
+        var R = p.algo = {};
+        return p;
       }(Math);
-      return t;
+      return n;
     });
-  }(_e)), _e.exports;
+  }(Ct)), Ct.exports;
 }
-(function(e, n) {
-  (function(t, o) {
-    e.exports = o(Be());
-  })(B, function(t) {
+(function(t, e) {
+  (function(n, o) {
+    t.exports = o(se());
+  })(J, function(n) {
     return function() {
-      var o = t, r = o.lib, s = r.WordArray, u = o.enc;
-      u.Base64 = {
+      var o = n, i = o.lib, s = i.WordArray, d = o.enc;
+      d.Base64 = {
         /**
          * Converts a word array to a Base64 string.
          *
@@ -958,17 +1054,17 @@ function Be() {
          *
          *     var base64String = CryptoJS.enc.Base64.stringify(wordArray);
          */
-        stringify: function(v) {
-          var a = v.words, c = v.sigBytes, S = this._map;
-          v.clamp();
-          for (var m = [], p = 0; p < c; p += 3)
-            for (var C = a[p >>> 2] >>> 24 - p % 4 * 8 & 255, f = a[p + 1 >>> 2] >>> 24 - (p + 1) % 4 * 8 & 255, y = a[p + 2 >>> 2] >>> 24 - (p + 2) % 4 * 8 & 255, R = C << 16 | f << 8 | y, l = 0; l < 4 && p + l * 0.75 < c; l++)
-              m.push(S.charAt(R >>> 6 * (3 - l) & 63));
-          var d = S.charAt(64);
-          if (d)
-            for (; m.length % 4; )
-              m.push(d);
-          return m.join("");
+        stringify: function(p) {
+          var a = p.words, y = p.sigBytes, c = this._map;
+          p.clamp();
+          for (var b = [], g = 0; g < y; g += 3)
+            for (var k = a[g >>> 2] >>> 24 - g % 4 * 8 & 255, _ = a[g + 1 >>> 2] >>> 24 - (g + 1) % 4 * 8 & 255, S = a[g + 2 >>> 2] >>> 24 - (g + 2) % 4 * 8 & 255, R = k << 16 | _ << 8 | S, l = 0; l < 4 && g + l * 0.75 < y; l++)
+              b.push(c.charAt(R >>> 6 * (3 - l) & 63));
+          var f = c.charAt(64);
+          if (f)
+            for (; b.length % 4; )
+              b.push(f);
+          return b.join("");
         },
         /**
          * Converts a Base64 string to a word array.
@@ -983,123 +1079,227 @@ function Be() {
          *
          *     var wordArray = CryptoJS.enc.Base64.parse(base64String);
          */
-        parse: function(v) {
-          var a = v.length, c = this._map, S = this._reverseMap;
-          if (!S) {
-            S = this._reverseMap = [];
-            for (var m = 0; m < c.length; m++)
-              S[c.charCodeAt(m)] = m;
+        parse: function(p) {
+          var a = p.length, y = this._map, c = this._reverseMap;
+          if (!c) {
+            c = this._reverseMap = [];
+            for (var b = 0; b < y.length; b++)
+              c[y.charCodeAt(b)] = b;
           }
-          var p = c.charAt(64);
-          if (p) {
-            var C = v.indexOf(p);
-            C !== -1 && (a = C);
+          var g = y.charAt(64);
+          if (g) {
+            var k = p.indexOf(g);
+            k !== -1 && (a = k);
           }
-          return h(v, a, S);
+          return h(p, a, c);
         },
         _map: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
       };
-      function h(v, a, c) {
-        for (var S = [], m = 0, p = 0; p < a; p++)
-          if (p % 4) {
-            var C = c[v.charCodeAt(p - 1)] << p % 4 * 2, f = c[v.charCodeAt(p)] >>> 6 - p % 4 * 2, y = C | f;
-            S[m >>> 2] |= y << 24 - m % 4 * 8, m++;
+      function h(p, a, y) {
+        for (var c = [], b = 0, g = 0; g < a; g++)
+          if (g % 4) {
+            var k = y[p.charCodeAt(g - 1)] << g % 4 * 2, _ = y[p.charCodeAt(g)] >>> 6 - g % 4 * 2, S = k | _;
+            c[b >>> 2] |= S << 24 - b % 4 * 8, b++;
           }
-        return s.create(S, m);
+        return s.create(c, b);
       }
-    }(), t.enc.Base64;
+    }(), n.enc.Base64;
   });
-})(Ue);
-var Dt = Ue.exports;
-const Nt = /* @__PURE__ */ Ke(Dt);
-var Fe = { exports: {} };
-(function(e, n) {
-  (function(t, o) {
-    e.exports = o(Be());
-  })(B, function(t) {
+})(re);
+var on = re.exports;
+const rn = /* @__PURE__ */ ie(on);
+var ae = { exports: {} };
+(function(t, e) {
+  (function(n, o) {
+    t.exports = o(se());
+  })(J, function(n) {
     return function(o) {
-      var r = t, s = r.lib, u = s.WordArray, h = s.Hasher, v = r.algo, a = [], c = [];
+      var i = n, s = i.lib, d = s.WordArray, h = s.Hasher, p = i.algo, a = [], y = [];
       (function() {
-        function p(R) {
-          for (var l = o.sqrt(R), d = 2; d <= l; d++)
-            if (!(R % d))
+        function g(R) {
+          for (var l = o.sqrt(R), f = 2; f <= l; f++)
+            if (!(R % f))
               return !1;
           return !0;
         }
-        function C(R) {
+        function k(R) {
           return (R - (R | 0)) * 4294967296 | 0;
         }
-        for (var f = 2, y = 0; y < 64; )
-          p(f) && (y < 8 && (a[y] = C(o.pow(f, 1 / 2))), c[y] = C(o.pow(f, 1 / 3)), y++), f++;
+        for (var _ = 2, S = 0; S < 64; )
+          g(_) && (S < 8 && (a[S] = k(o.pow(_, 1 / 2))), y[S] = k(o.pow(_, 1 / 3)), S++), _++;
       })();
-      var S = [], m = v.SHA256 = h.extend({
+      var c = [], b = p.SHA256 = h.extend({
         _doReset: function() {
-          this._hash = new u.init(a.slice(0));
+          this._hash = new d.init(a.slice(0));
         },
-        _doProcessBlock: function(p, C) {
-          for (var f = this._hash.words, y = f[0], R = f[1], l = f[2], d = f[3], g = f[4], b = f[5], E = f[6], k = f[7], I = 0; I < 64; I++) {
+        _doProcessBlock: function(g, k) {
+          for (var _ = this._hash.words, S = _[0], R = _[1], l = _[2], f = _[3], v = _[4], m = _[5], A = _[6], E = _[7], I = 0; I < 64; I++) {
             if (I < 16)
-              S[I] = p[C + I] | 0;
+              c[I] = g[k + I] | 0;
             else {
-              var w = S[I - 15], T = (w << 25 | w >>> 7) ^ (w << 14 | w >>> 18) ^ w >>> 3, A = S[I - 2], $ = (A << 15 | A >>> 17) ^ (A << 13 | A >>> 19) ^ A >>> 10;
-              S[I] = T + S[I - 7] + $ + S[I - 16];
+              var w = c[I - 15], x = (w << 25 | w >>> 7) ^ (w << 14 | w >>> 18) ^ w >>> 3, L = c[I - 2], T = (L << 15 | L >>> 17) ^ (L << 13 | L >>> 19) ^ L >>> 10;
+              c[I] = x + c[I - 7] + T + c[I - 16];
             }
-            var V = g & b ^ ~g & E, L = y & R ^ y & l ^ R & l, P = (y << 30 | y >>> 2) ^ (y << 19 | y >>> 13) ^ (y << 10 | y >>> 22), q = (g << 26 | g >>> 6) ^ (g << 21 | g >>> 11) ^ (g << 7 | g >>> 25), Y = k + q + V + c[I] + S[I], re = P + L;
-            k = E, E = b, b = g, g = d + Y | 0, d = l, l = R, R = y, y = Y + re | 0;
+            var F = v & m ^ ~v & A, M = S & R ^ S & l ^ R & l, B = (S << 30 | S >>> 2) ^ (S << 19 | S >>> 13) ^ (S << 10 | S >>> 22), j = (v << 26 | v >>> 6) ^ (v << 21 | v >>> 11) ^ (v << 7 | v >>> 25), Z = E + j + F + y[I] + c[I], _t = B + M;
+            E = A, A = m, m = v, v = f + Z | 0, f = l, l = R, R = S, S = Z + _t | 0;
           }
-          f[0] = f[0] + y | 0, f[1] = f[1] + R | 0, f[2] = f[2] + l | 0, f[3] = f[3] + d | 0, f[4] = f[4] + g | 0, f[5] = f[5] + b | 0, f[6] = f[6] + E | 0, f[7] = f[7] + k | 0;
+          _[0] = _[0] + S | 0, _[1] = _[1] + R | 0, _[2] = _[2] + l | 0, _[3] = _[3] + f | 0, _[4] = _[4] + v | 0, _[5] = _[5] + m | 0, _[6] = _[6] + A | 0, _[7] = _[7] + E | 0;
         },
         _doFinalize: function() {
-          var p = this._data, C = p.words, f = this._nDataBytes * 8, y = p.sigBytes * 8;
-          return C[y >>> 5] |= 128 << 24 - y % 32, C[(y + 64 >>> 9 << 4) + 14] = o.floor(f / 4294967296), C[(y + 64 >>> 9 << 4) + 15] = f, p.sigBytes = C.length * 4, this._process(), this._hash;
+          var g = this._data, k = g.words, _ = this._nDataBytes * 8, S = g.sigBytes * 8;
+          return k[S >>> 5] |= 128 << 24 - S % 32, k[(S + 64 >>> 9 << 4) + 14] = o.floor(_ / 4294967296), k[(S + 64 >>> 9 << 4) + 15] = _, g.sigBytes = k.length * 4, this._process(), this._hash;
         },
         clone: function() {
-          var p = h.clone.call(this);
-          return p._hash = this._hash.clone(), p;
+          var g = h.clone.call(this);
+          return g._hash = this._hash.clone(), g;
         }
       });
-      r.SHA256 = h._createHelper(m), r.HmacSHA256 = h._createHmacHelper(m);
-    }(Math), t.SHA256;
+      i.SHA256 = h._createHelper(b), i.HmacSHA256 = h._createHmacHelper(b);
+    }(Math), n.SHA256;
   });
-})(Fe);
-var Mt = Fe.exports;
-const Ht = /* @__PURE__ */ Ke(Mt), Wt = () => {
-  const e = Ct(), n = Ht(e);
-  return Nt.stringify(n).replace(/=*$/g, "").replace(/\+/g, "-").replace(/\//g, "_");
-};
-var M;
-(function(e) {
-  e.LOADING = "loading", e.LOADED = "loaded", e.NOT_LOADED = "not_loaded";
-})(M || (M = {}));
+})(ae);
+var sn = ae.exports;
+const an = /* @__PURE__ */ ie(sn), cn = (t) => {
+  const e = an(t);
+  return rn.stringify(e).replace(/=*$/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+}, Rt = (t, e, n) => {
+  const o = {
+    ...e,
+    v: Qt,
+    sdk_type: "vkid",
+    app_id: n.app,
+    redirect_uri: n.redirectUrl,
+    debug: n.__debug ? 1 : null,
+    localhost: n.__localhost ? 1 : null
+  }, i = Y.stringify(o, {
+    skipNull: !0
+  });
+  return `https://${n.__vkidDomain}/${t}?${i}`;
+}, ce = (t, e) => {
+  const n = e.get().redirectUrl, o = n.includes("?"), i = Object.keys(t).map((s) => encodeURIComponent(s) + "=" + encodeURIComponent(t[s])).join("&");
+  return `${n}${o ? "&" : "?"}${i}`;
+}, ln = (t) => {
+  if (Object.values(t).filter(Boolean).length)
+    return btoa(JSON.stringify(t));
+}, le = Be("qazwsxedcrfvtgbyhnujmikol", 6);
+function dn(t) {
+  return t = t || /* @__PURE__ */ Object.create(null), {
+    /**
+     * Register an event handler for the given type.
+     *
+     * @param  {String} type	Type of event to listen for, or `"*"` for all events
+     * @param  {Function} handler Function to call in response to given event
+     * @memberOf mitt
+     */
+    on: function(n, o) {
+      (t[n] || (t[n] = [])).push(o);
+    },
+    /**
+     * Remove an event handler for the given type.
+     *
+     * @param  {String} type	Type of event to unregister `handler` from, or `"*"`
+     * @param  {Function} handler Handler function to remove
+     * @memberOf mitt
+     */
+    off: function(n, o) {
+      t[n] && t[n].splice(t[n].indexOf(o) >>> 0, 1);
+    },
+    /**
+     * Invoke all handlers for the given type.
+     * If present, `"*"` handlers are invoked after type-matched handlers.
+     *
+     * @param {String} type  The event type to invoke
+     * @param {Any} [evt]  Any value (object is recommended and powerful), passed to each handler
+     * @memberOf mitt
+     */
+    emit: function(n, o) {
+      (t[n] || []).slice().map(function(i) {
+        i(o);
+      }), (t["*"] || []).slice().map(function(i) {
+        i(n, o);
+      });
+    }
+  };
+}
+class de {
+  constructor() {
+    u(this, "events", dn());
+  }
+  on(e, n) {
+    return this.events.on(e, n), this;
+  }
+  off(e, n) {
+    return this.events.off(e, n), this;
+  }
+}
+var dt;
+(function(t) {
+  t.MESSAGE = "message", t.UNSUPPORTED_MESSAGE = "unsupported_message";
+})(dt || (dt = {}));
+const Ft = "vk-sak-sdk";
+class un extends de {
+  constructor(n) {
+    super();
+    u(this, "config");
+    this.config = n, this.handleMessage = this.handleMessage.bind(this), window.addEventListener("message", this.handleMessage);
+  }
+  destroy() {
+    delete this.config, window.removeEventListener("message", this.handleMessage);
+  }
+  sendMessage(n) {
+    var o;
+    (o = this.config.iframe.contentWindow) == null || o.postMessage({
+      type: Ft,
+      ...n
+    }, this.config.origin);
+  }
+  handleMessage(n) {
+    var i;
+    if (!this.config.origin || n.origin !== this.config.origin || n.source !== this.config.iframe.contentWindow || ((i = n.data) == null ? void 0 : i.type) !== Ft) {
+      this.events.emit(dt.UNSUPPORTED_MESSAGE, n.data);
+      return;
+    }
+    this.events.emit(dt.MESSAGE, n.data);
+  }
+}
 var W;
-(function(e) {
-  e[e.TimeoutExceeded = 0] = "TimeoutExceeded", e[e.InternalError = 1] = "InternalError";
+(function(t) {
+  t.LOGIN_SUCCESS = "onetap: success login", t.SHOW_FULL_AUTH = "onetap: show full auth", t.START_AUTHORIZE = "onetap: start authorize", t.NOT_AUTHORIZED = "onetap: not authorized", t.AUTHENTICATION_INFO = "onetap: authentication_info";
 })(W || (W = {}));
-const Re = {
-  [W.TimeoutExceeded]: "timeout",
-  [W.InternalError]: "internal error"
+var H;
+(function(t) {
+  t.LOADING = "loading", t.LOADED = "loaded", t.NOT_LOADED = "not_loaded";
+})(H || (H = {}));
+var U;
+(function(t) {
+  t[t.TimeoutExceeded = 0] = "TimeoutExceeded", t[t.InternalError = 1] = "InternalError", t[t.AuthError = 2] = "AuthError";
+})(U || (U = {}));
+const Wt = {
+  [U.TimeoutExceeded]: "timeout",
+  [U.InternalError]: "internal error",
+  [U.AuthError]: "auth error"
 };
-var D;
-(function(e) {
-  e.START_LOAD = "common: start load", e.LOAD = "common: load", e.SHOW = "common: show", e.HIDE = "common: hide", e.CLOSE = "common: close", e.ERROR = "common: error", e.RESIZE = "common: resize";
-})(D || (D = {}));
-const Pt = (e) => `
-<div id="${e}" data-test-id="widget">
+var $;
+(function(t) {
+  t.START_LOAD = "common: start load", t.LOAD = "common: load", t.SHOW = "common: show", t.HIDE = "common: hide", t.CLOSE = "common: close", t.ERROR = "common: error", t.RESIZE = "common: resize";
+})($ || ($ = {}));
+const hn = (t) => `
+<div id="${t}" data-test-id="widget">
   <style>
-    #${e} {
+    #${t} {
       width: 100%;
       height: 100%;
       max-width: 100%;
       max-height: 100%;
     }
 
-    #${e} iframe {
+    #${t} iframe {
       border: none;
       color-scheme: auto;
     }
 
-    #${e} .loader,
-    #${e} .error {
+    #${t} .loader,
+    #${t} .error {
       display: none;
       width: 100%;
       height: 100%;
@@ -1111,90 +1311,92 @@ const Pt = (e) => `
   <iframe width="100%" height="100%"></iframe>
 </div>
   `;
-function Kt(e, n, t, o) {
-  var r = arguments.length, s = r < 3 ? n : o === null ? o = Object.getOwnPropertyDescriptor(n, t) : o, u;
-  if (typeof Reflect == "object" && typeof Reflect.decorate == "function") s = Reflect.decorate(e, n, t, o);
-  else for (var h = e.length - 1; h >= 0; h--) (u = e[h]) && (s = (r < 3 ? u(s) : r > 3 ? u(n, t, s) : u(n, t)) || s);
-  return r > 3 && s && Object.defineProperty(n, t, s), s;
+function fn(t, e, n, o) {
+  var i = arguments.length, s = i < 3 ? e : o === null ? o = Object.getOwnPropertyDescriptor(e, n) : o, d;
+  if (typeof Reflect == "object" && typeof Reflect.decorate == "function") s = Reflect.decorate(t, e, n, o);
+  else for (var h = t.length - 1; h >= 0; h--) (d = t[h]) && (s = (i < 3 ? d(s) : i > 3 ? d(e, n, s) : d(e, n)) || s);
+  return i > 3 && s && Object.defineProperty(e, n, s), s;
 }
-const Ut = 5e3, Bt = 300, Ft = "s256", F = class F extends We {
+const _n = 5e3, pn = 300, Q = class Q extends de {
   constructor() {
     super();
-    _(this, "id", Se());
-    _(this, "lang");
-    _(this, "scheme");
-    _(this, "vkidAppName", "");
-    _(this, "config");
-    _(this, "timeoutTimer");
-    _(this, "bridge");
-    _(this, "container");
-    _(this, "templateRenderer", Pt);
-    _(this, "elements");
-    this.config = F.__config;
+    u(this, "id", le());
+    u(this, "lang");
+    u(this, "scheme");
+    u(this, "vkidAppName", "");
+    u(this, "config");
+    u(this, "timeoutTimer");
+    u(this, "bridge");
+    u(this, "container");
+    u(this, "templateRenderer", hn);
+    u(this, "elements");
+    this.config = Q.config;
   }
-  render(t) {
-    const { container: o, ...r } = t;
-    return this.container = o, this.renderTemplate(), this.registerElements(), this.loadWidgetFrame(r), this;
+  render(n) {
+    const { container: o, ...i } = n;
+    return this.container = o, this.renderTemplate(), this.registerElements(), "fastAuthDisabled" in n && n.fastAuthDisabled ? (this.setState(H.NOT_LOADED), this) : (this.loadWidgetFrame(i), this);
   }
   close() {
-    var t, o, r;
-    clearTimeout(this.timeoutTimer), (o = (t = this.elements) == null ? void 0 : t.root) == null || o.remove(), (r = this.bridge) == null || r.destroy(), this.events.emit(D.CLOSE);
+    var n, o, i;
+    clearTimeout(this.timeoutTimer), (o = (n = this.elements) == null ? void 0 : n.root) == null || o.remove(), (i = this.bridge) == null || i.destroy(), this.events.emit($.CLOSE);
   }
   show() {
-    return this.elements.root && (this.elements.root.style.display = "block", this.events.emit(D.SHOW)), this;
+    return this.elements.root && (this.elements.root.style.display = "block", this.events.emit($.SHOW)), this;
   }
   hide() {
-    return this.elements.root && (this.elements.root.style.display = "none", this.events.emit(D.HIDE)), this;
+    return this.elements.root && (this.elements.root.style.display = "none", this.events.emit($.HIDE)), this;
   }
   /**
   * Метод вызывается перед началом загрузки iframe с VK ID приложением
   */
   onStartLoadHandler() {
-    this.setState(M.LOADING), this.timeoutTimer = setTimeout(() => {
+    this.setState(H.LOADING), this.timeoutTimer = setTimeout(() => {
       this.onErrorHandler({
-        code: W.TimeoutExceeded,
-        text: Re[W.TimeoutExceeded]
+        code: U.TimeoutExceeded,
+        text: Wt[U.TimeoutExceeded]
       });
-    }, Ut), this.events.emit(D.START_LOAD);
+    }, _n), this.events.emit($.START_LOAD);
   }
   /**
   * Метод вызывается после того, как полностью загружен iframe с VK ID приложением
   */
   onLoadHandler() {
     clearTimeout(this.timeoutTimer), setTimeout(() => {
-      this.setState(M.LOADED);
-    }, Bt), this.events.emit(D.LOAD);
+      this.setState(H.LOADED);
+    }, pn), this.events.emit($.LOAD);
   }
   /**
   * Метод вызывается, когда во время работы/загрузки VK ID приложения произошла ошибка
   */
-  onErrorHandler(t) {
-    var o, r;
-    clearTimeout(this.timeoutTimer), this.setState(M.NOT_LOADED), this.events.emit(D.ERROR, t), (r = (o = this.elements) == null ? void 0 : o.iframe) == null || r.remove();
+  onErrorHandler(n) {
+    var o, i;
+    clearTimeout(this.timeoutTimer), this.setState(H.NOT_LOADED), this.events.emit(W.AUTHENTICATION_INFO, {
+      is_online: !1
+    }), this.events.emit($.ERROR, n), (i = (o = this.elements) == null ? void 0 : o.iframe) == null || i.remove();
   }
   /**
   * Метод вызывается при сообщениях от VK ID приложения
   */
-  onBridgeMessageHandler(t) {
-    switch (t.handler) {
-      case D.LOAD: {
+  onBridgeMessageHandler(n) {
+    switch (n.handler) {
+      case $.LOAD: {
         this.onLoadHandler();
         break;
       }
-      case D.CLOSE: {
+      case $.CLOSE: {
         this.close();
         break;
       }
-      case D.ERROR: {
+      case $.ERROR: {
         this.onErrorHandler({
-          code: W.InternalError,
-          text: Re[W.InternalError],
-          details: t.params
+          code: U.InternalError,
+          text: Wt[U.InternalError],
+          details: n.params
         });
         break;
       }
-      case D.RESIZE: {
-        this.elements.root.style.height = `${t.params.height}px`;
+      case $.RESIZE: {
+        this.elements.root.style.height = `${n.params.height}px`;
         break;
       }
     }
@@ -1203,159 +1405,225 @@ const Ut = 5e3, Bt = 300, Ft = "s256", F = class F extends We {
   renderTemplate() {
     this.container.insertAdjacentHTML("beforeend", this.templateRenderer(this.id));
   }
-  loadWidgetFrame(t) {
-    this.onStartLoadHandler(), this.bridge = new At({
+  loadWidgetFrame(n) {
+    this.onStartLoadHandler(), this.bridge = new un({
       iframe: this.elements.iframe,
       origin: `https://${this.config.get().__vkidDomain}`
-    }), this.bridge.on(ee.MESSAGE, (o) => this.onBridgeMessageHandler(o)), this.elements.iframe.src = this.getWidgetFrameSrc(this.config.get(), t);
+    }), this.bridge.on(dt.MESSAGE, (o) => this.onBridgeMessageHandler(o)), this.elements.iframe.src = this.getWidgetFrameSrc(this.config.get(), n);
   }
-  getWidgetFrameSrc(t, o) {
-    const r = {
+  getWidgetFrameSrc(n, o) {
+    const i = {
       ...o,
-      code_challenge: Wt(),
-      code_challenge_method: Ft,
-      origin: location.protocol + "//" + location.host
+      origin: location.protocol + "//" + location.host,
+      oauth_version: 2
     };
-    return Me(this.vkidAppName, r, t);
+    return Rt(this.vkidAppName, i, n);
   }
-  setState(t) {
-    this.elements.root.setAttribute("data-state", t);
+  setState(n) {
+    this.elements.root.setAttribute("data-state", n);
   }
   registerElements() {
-    const t = document.getElementById(this.id);
+    const n = document.getElementById(this.id);
     this.elements = {
-      root: t,
-      iframe: t.querySelector("iframe")
+      root: n,
+      iframe: n.querySelector("iframe")
     };
   }
-  // TODO: добавить типы
-  redirectWithPayload(t) {
-    location.assign(He(t, F.__config));
+  redirectWithPayload(n) {
+    location.assign(ce(n, Q.config));
   }
 };
 /**
 * @ignore
 */
-_(F, "__config"), /**
+u(Q, "config"), /**
 * @ignore
 */
-_(F, "__auth");
-let H = F;
-Kt([
-  de({
+u(Q, "auth");
+let G = Q;
+fn([
+  ft({
     container: [
-      Pe
+      vt
     ]
   })
-], H.prototype, "render", null);
-var i;
-(function(e) {
-  e[e.RUS = 0] = "RUS", e[e.UKR = 1] = "UKR", e[e.ENG = 3] = "ENG", e[e.SPA = 4] = "SPA", e[e.GERMAN = 6] = "GERMAN", e[e.POL = 15] = "POL", e[e.FRA = 16] = "FRA", e[e.TURKEY = 82] = "TURKEY";
-})(i || (i = {}));
-var te;
-(function(e) {
-  e.LIGHT = "light", e.DARK = "dark";
-})(te || (te = {}));
-var G;
-(function(e) {
-  e.ACCEPT = "agreements dialog: accept", e.DECLINE = "agreements dialog: decline";
-})(G || (G = {}));
-var ne;
-(function(e) {
-  e.ACCEPT = "agreements dialog: accept";
-})(ne || (ne = {}));
-const zt = (e) => `
-<div id="${e}" data-test-id="agreements-dialog">
-  <style>
-    #${e} {
-      position: fixed;
-      top: 0px;
-      right: 0px;
-      width: 100%;
-      height: 100%;
-      z-index: 999999;
-    }
-
-    #${e} iframe {
-      border: none;
-      color-scheme: auto;
-    }
-  </style>
-  <iframe width="100%" height="100%" />
-</div>
-  `;
-class ze extends H {
-  constructor() {
-    super(...arguments);
-    _(this, "vkidAppName", "user_policy_agreements");
-    _(this, "templateRenderer", zt);
+], G.prototype, "render", null);
+var r;
+(function(t) {
+  t[t.RUS = 0] = "RUS", t[t.UKR = 1] = "UKR", t[t.ENG = 3] = "ENG", t[t.SPA = 4] = "SPA", t[t.GERMAN = 6] = "GERMAN", t[t.POL = 15] = "POL", t[t.FRA = 16] = "FRA", t[t.UZB = 65] = "UZB", t[t.TURKEY = 82] = "TURKEY", t[t.KAZ = 97] = "KAZ", t[t.BEL = 114] = "BEL";
+})(r || (r = {}));
+var nt;
+(function(t) {
+  t.LIGHT = "light", t.DARK = "dark";
+})(nt || (nt = {}));
+class gn {
+  constructor(e) {
+    u(this, "registrationStatsCollector");
+    u(this, "uniqueSessionId");
+    const n = new q(e), o = new ht(n);
+    this.registrationStatsCollector = new Et(o);
   }
-  onBridgeMessageHandler(t) {
-    switch (t.handler) {
-      case G.DECLINE: {
-        this.close();
-        break;
+  setUniqueSessionId(e) {
+    this.uniqueSessionId = e;
+  }
+  getFields() {
+    const e = [
+      {
+        name: "sdk_type",
+        value: "vkid"
       }
-      case G.ACCEPT: {
-        this.events.emit(ne.ACCEPT, t);
-        break;
-      }
-      default:
-        super.onBridgeMessageHandler(t);
-        break;
-    }
+    ];
+    return this.uniqueSessionId && e.push({
+      name: "unique_session_id",
+      value: this.uniqueSessionId
+    }), e;
+  }
+  sendMultibrandingOauthAdded({ screen: e, fields: n }) {
+    this.registrationStatsCollector.logEvent(e, {
+      event_type: "multibranding_oauth_added",
+      fields: [
+        ...this.getFields(),
+        ...n
+      ]
+    });
+  }
+  sendOkButtonShow({ screen: e, isIcon: n }) {
+    this.registrationStatsCollector.logEvent(e, {
+      event_type: "ok_button_show",
+      fields: [
+        ...this.getFields(),
+        {
+          name: "button_type",
+          value: n ? "icon" : "default"
+        }
+      ]
+    });
+  }
+  sendVkButtonShow({ screen: e, isIcon: n }) {
+    this.registrationStatsCollector.logEvent(e, {
+      event_type: "vk_button_show",
+      fields: [
+        ...this.getFields(),
+        {
+          name: "button_type",
+          value: n ? "icon" : "default"
+        }
+      ]
+    });
+  }
+  sendMailButtonShow({ screen: e, isIcon: n }) {
+    this.registrationStatsCollector.logEvent(e, {
+      event_type: "mail_button_show",
+      fields: [
+        ...this.getFields(),
+        {
+          name: "button_type",
+          value: n ? "icon" : "default"
+        }
+      ]
+    });
+  }
+  sendVkButtonTap({ screen: e, isIcon: n }) {
+    return this.registrationStatsCollector.logEvent(e, {
+      event_type: "vk_button_tap",
+      fields: [
+        ...this.getFields(),
+        {
+          name: "button_type",
+          value: n ? "icon" : "default"
+        }
+      ]
+    });
+  }
+  sendOkButtonTap({ screen: e, isIcon: n }) {
+    return this.registrationStatsCollector.logEvent(e, {
+      event_type: "ok_button_tap",
+      fields: [
+        ...this.getFields(),
+        {
+          name: "button_type",
+          value: n ? "icon" : "default"
+        }
+      ]
+    });
+  }
+  sendMailButtonTap({ screen: e, isIcon: n }) {
+    return this.registrationStatsCollector.logEvent(e, {
+      event_type: "mail_button_tap",
+      fields: [
+        ...this.getFields(),
+        {
+          name: "button_type",
+          value: n ? "icon" : "default"
+        }
+      ]
+    });
   }
 }
-var N;
-(function(e) {
-  e.OK = "ok_ru", e.MAIL = "mail_ru", e.VK = "vkid";
-})(N || (N = {}));
-const Gt = {
-  [N.OK]: "OK",
-  [N.MAIL]: "Mail.ru",
-  [N.VK]: "VK ID"
-}, jt = {
-  [i.RUS]: "или войти через VK ID с использованием данных из сервиса",
-  [i.UKR]: "або увійти через VK ID з використанням даних із сервісу",
-  [i.ENG]: "or sign in with VK ID using information from a service",
-  [i.SPA]: "o iniciar sesión con VK ID utilizando la información de un servicio",
-  [i.GERMAN]: "oder melden Sie sich mit Ihrer VK-ID an, indem Sie Informationen aus dem Dienst verwenden",
-  [i.POL]: "lub wejdź poprzez VK ID przy użyciu danych z serwisu",
-  [i.FRA]: "ou se connecter avec VK ID en utilisant les informations d'un service",
-  [i.TURKEY]: "Ya da hizmetteki verileri kullanarak VK ID hizmeti yardımıyla gir"
-}, xe = {
-  [i.RUS]: {
-    [N.OK]: "Войти через OK",
-    [N.MAIL]: "Войти с Почтой Mail.ru",
-    [N.VK]: "Войти с VK ID"
+var st;
+(function(t) {
+  t.VK = "vk", t.OK = "ok", t.MAIL = "mail";
+})(st || (st = {}));
+var C;
+(function(t) {
+  t.OK = "ok_ru", t.MAIL = "mail_ru", t.VK = "vkid";
+})(C || (C = {}));
+var Vt;
+(function(t) {
+  t[t.OK = C.OK] = "OK", t[t.MAIL = C.MAIL] = "MAIL";
+})(Vt || (Vt = {}));
+const vn = {
+  [C.OK]: "OK",
+  [C.MAIL]: "Mail.ru",
+  [C.VK]: "VK ID"
+}, bn = {
+  [r.RUS]: "или войти через VK ID с использованием данных из сервиса",
+  [r.UKR]: "або увійти через VK ID з використанням даних із сервісу",
+  [r.BEL]: "ці ўвайсці праз VK ID з выкарыстаннем даных з сэрвісу",
+  [r.KAZ]: "сервистегі деректерді пайдаланып VK ID арқылы кіру",
+  [r.UZB]: "yoki xizmatning maʼlumotlaridan foydalangan holda VK ID orqali kirish",
+  [r.ENG]: "or sign in with VK ID using information from a service",
+  [r.SPA]: "o iniciar sesión con VK ID utilizando la información de un servicio",
+  [r.GERMAN]: "oder melden Sie sich mit Ihrer VK-ID an, indem Sie Informationen aus dem Dienst verwenden",
+  [r.POL]: "lub wejdź poprzez VK ID przy użyciu danych z serwisu",
+  [r.FRA]: "ou se connecter avec VK ID en utilisant les informations d'un service",
+  [r.TURKEY]: "Ya da hizmetteki verileri kullanarak VK ID hizmeti yardımıyla gir"
+}, zt = {
+  [r.RUS]: {
+    [C.OK]: "Войти через OK",
+    [C.MAIL]: "Войти с Почтой Mail.ru",
+    [C.VK]: "Войти с VK ID"
   },
-  [i.UKR]: "Увійти з {provider}",
-  [i.ENG]: "Sign in with {provider}",
-  [i.SPA]: "Iniciar sesión con {provider}",
-  [i.GERMAN]: "Mit {provider} anmelden",
-  [i.POL]: "Zaloguj się z {provider}",
-  [i.FRA]: "Se connecter avec {provider}",
-  [i.TURKEY]: "{provider}'den gir"
-}, Zt = `
+  [r.UKR]: "Увійти з {provider}",
+  [r.BEL]: "Увайсці з {provider}",
+  [r.KAZ]: "{provider} кіру",
+  [r.UZB]: "{provider} orqali kirish",
+  [r.ENG]: "Sign in with {provider}",
+  [r.SPA]: "Iniciar sesión con {provider}",
+  [r.GERMAN]: "Mit {provider} anmelden",
+  [r.POL]: "Zaloguj się z {provider}",
+  [r.FRA]: "Se connecter avec {provider}",
+  [r.TURKEY]: "{provider}'den gir"
+}, mn = `
   <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M14 22C13.4477 22 13 21.5523 13 21C13 20.4477 13.4477 20 14 20C17.3137 20 20 17.3137 20 14C20 10.6863 17.3137 8 14 8C10.6863 8 8 10.6863 8 14C8 14.6472 8.10214 15.2793 8.3002 15.8802C8.4731 16.4047 8.18807 16.9701 7.66355 17.143C7.13902 17.3159 6.57365 17.0308 6.40074 16.5063C6.13628 15.7041 6 14.8606 6 14C6 9.58172 9.58172 6 14 6C18.4183 6 22 9.58172 22 14C22 18.4183 18.4183 22 14 22Z" fill="currentColor"/>
   </svg>
-`, qt = {
-  [N.VK]: (e) => `
-<svg width="${e + 1}" height="${e}" viewBox="0 0 29 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+`, Sn = {
+  [C.VK]: (t) => `
+<svg width="${t + 1}" height="${t}" viewBox="0 0 29 28" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M3.33331 13.56C3.33331 8.58197 3.33331 6.09295 4.87979 4.54648C6.42627 3 8.91528 3 13.8933 3H14.7733C19.7513 3 22.2404 3 23.7868 4.54648C25.3333 6.09295 25.3333 8.58197 25.3333 13.56V14.44C25.3333 19.418 25.3333 21.907 23.7868 23.4535C22.2404 25 19.7513 25 14.7733 25H13.8933C8.91528 25 6.42627 25 4.87979 23.4535C3.33331 21.907 3.33331 19.418 3.33331 14.44V13.56Z" fill="#0077FF" style="fill:#0077FF;fill:color(display-p3 0.0000 0.4667 1.0000);fill-opacity:1;"/>
   <path d="M15.0398 18.9C10.0174 18.9 7.15269 15.4466 7.03333 9.70001H9.54912C9.63175 13.9178 11.4864 15.7044 12.9555 16.0728V9.70001H15.3245V13.3376C16.7752 13.1811 18.2992 11.5234 18.8134 9.70001H21.1823C20.7875 11.9471 19.1348 13.6047 17.9595 14.2862C19.1348 14.8387 21.0171 16.2846 21.7333 18.9H19.1256C18.5655 17.1503 17.17 15.7965 15.3245 15.6123V18.9H15.0398Z" fill="white" style="fill:white;fill:white;fill-opacity:1;"/>
 </svg>
   `,
-  [N.OK]: (e) => `
-<svg width="${e}" height="${e}" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+  [C.OK]: (t) => `
+<svg width="${t}" height="${t}" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path fill-rule="evenodd" clip-rule="evenodd" d="M3.67554 3.67638C2 5.36482 2 8.09045 2 13.5176V14.4824C2 19.9216 2 22.6352 3.68759 24.3236C5.37519 26 8.09944 26 13.5238 26H14.4882C19.9126 26 22.6489 26 24.3245 24.3236C26 22.6352 26 19.9095 26 14.4824V13.5176C26 8.09045 26 5.35276 24.3245 3.67638C22.6369 2 19.9126 2 14.4882 2H13.5239C8.08739 2 5.37519 2 3.67554 3.67638Z" fill="#EE8208" style="fill:#EE8208;fill:color(display-p3 0.9333 0.5098 0.0314);fill-opacity:1;"/>
   <path fill-rule="evenodd" clip-rule="evenodd" d="M17.1157 12.621C16.3239 13.4108 15.218 13.9122 13.999 13.9122C12.7926 13.9122 11.6741 13.4108 10.8823 12.621C10.0906 11.8313 9.58793 10.7407 9.58793 9.51224C9.58793 8.28377 10.0906 7.18065 10.8823 6.40345C11.6741 5.61372 12.78 5.1123 13.999 5.1123C15.218 5.1123 16.3239 5.61372 17.1157 6.40345C17.9074 7.19319 18.4101 8.2963 18.4101 9.51224C18.4101 10.7282 17.9074 11.8313 17.1157 12.621ZM14.0116 7.49404C13.4586 7.49404 12.9559 7.71967 12.5915 8.0832C12.2396 8.44673 12.0008 8.94814 12.0008 9.4997C12.0008 10.0513 12.227 10.5527 12.5915 10.9162C12.9559 11.2797 13.446 11.5054 14.0116 11.5054C14.5645 11.5054 15.0672 11.2797 15.4317 10.9162C15.7961 10.5527 16.0223 10.0638 16.0223 9.4997C16.0223 8.94814 15.7961 8.44673 15.4317 8.0832C15.0672 7.71967 14.5771 7.49404 14.0116 7.49404Z" fill="white" style="fill:white;fill:white;fill-opacity:1;"/>
   <path d="M18.6614 13.9247L19.9558 15.6922C20.0312 15.7799 20.0187 15.8927 19.8553 15.968C18.762 16.8705 17.4927 17.4471 16.1731 17.7605L18.9128 22.5741C18.9882 22.7246 18.9002 22.8875 18.7368 22.8875H16.06C15.9721 22.8875 15.8967 22.8248 15.8715 22.7496L13.9613 18.4876L12.0511 22.7496C12.026 22.8374 11.9506 22.8875 11.8626 22.8875H9.1858C9.03499 22.8875 8.93445 22.712 9.00986 22.5741L11.7495 17.7605C10.4299 17.4471 9.16066 16.8454 8.06732 15.968C7.99192 15.8927 7.97935 15.7799 8.04219 15.6922L9.3366 13.9247C9.412 13.8369 9.56281 13.8244 9.65078 13.8996C10.8824 14.9401 12.3779 15.617 13.999 15.617C15.6202 15.617 17.1282 14.9401 18.3472 13.8996C18.4352 13.8119 18.586 13.8244 18.6614 13.9247Z" fill="white" style="fill:white;fill:white;fill-opacity:1;"/>
 </svg>
   `,
-  [N.MAIL]: (e) => `
-<svg width="${e + 1}" height="${e}" viewBox="0 0 29 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+  [C.MAIL]: (t) => `
+<svg width="${t + 1}" height="${t}" viewBox="0 0 29 28" fill="none" xmlns="http://www.w3.org/2000/svg">
   <g clip-path="url(#clip0_217_2730)">
   <path d="M14.6667 28C22.3987 28 28.6667 21.732 28.6667 14C28.6667 6.26801 22.3987 0 14.6667 0C6.9347 0 0.666687 6.26801 0.666687 14C0.666687 21.732 6.9347 28 14.6667 28Z" fill="#005FF9" style="fill:#005FF9;fill:color(display-p3 0.0000 0.3725 0.9765);fill-opacity:1;"/>
   <path d="M17.2957 14C17.2957 14.52 17.1415 15.0283 16.8526 15.4606C16.5637 15.8929 16.1531 16.2299 15.6728 16.4289C15.1924 16.6279 14.6638 16.6799 14.1538 16.5785C13.6438 16.477 13.1754 16.2267 12.8077 15.859C12.44 15.4913 12.1896 15.0229 12.0882 14.5129C11.9868 14.0029 12.0388 13.4743 12.2378 12.9939C12.4368 12.5135 12.7738 12.1029 13.2061 11.8141C13.6384 11.5252 14.1467 11.371 14.6667 11.371C15.3637 11.3718 16.0319 11.649 16.5248 12.1419C17.0177 12.6348 17.2949 13.303 17.2957 14ZM14.6667 5.259C13.2982 5.25874 11.9487 5.57982 10.7269 6.19638C9.50514 6.81295 8.44522 7.70778 7.63246 8.80882C6.81971 9.90987 6.27684 11.1864 6.04756 12.5356C5.81828 13.8847 5.909 15.2689 6.31241 16.5766C6.71581 17.8844 7.42064 19.0791 8.37015 20.0646C9.31966 21.0502 10.4873 21.799 11.7791 22.2509C13.0709 22.7027 14.4507 22.8449 15.8075 22.666C17.1643 22.4871 18.4601 21.9922 19.5907 21.221L19.6157 21.203L18.4377 19.834L18.4187 19.847C17.0632 20.7181 15.4476 21.092 13.8472 20.9048C12.2469 20.7177 10.7611 19.9811 9.64324 18.8207C8.52539 17.6603 7.84476 16.1481 7.71745 14.5419C7.59015 12.9357 8.02406 11.3351 8.94516 10.0131C9.86627 8.69111 11.2175 7.72965 12.7684 7.29274C14.3192 6.85582 15.9736 6.97052 17.4494 7.61725C18.9251 8.26399 20.1308 9.40269 20.8606 10.8391C21.5905 12.2756 21.7994 13.9207 21.4517 15.494C21.4123 15.8149 21.2547 16.1096 21.0097 16.3206C20.7647 16.5315 20.4499 16.6436 20.1267 16.635C19.9786 16.6249 19.834 16.5855 19.7013 16.5189C19.5686 16.4524 19.4505 16.3602 19.3538 16.2476C19.2571 16.135 19.1838 16.0042 19.1381 15.863C19.0924 15.7218 19.0753 15.5729 19.0877 15.425V14C19.089 12.975 18.7346 11.9813 18.085 11.1885C17.4354 10.3957 16.5308 9.85284 15.5255 9.6526C14.5203 9.45236 13.4768 9.60713 12.5729 10.0905C11.6691 10.5739 10.961 11.3559 10.5694 12.3032C10.1779 13.2504 10.1272 14.3042 10.4259 15.2847C10.7247 16.2651 11.3544 17.1116 12.2076 17.6795C13.0609 18.2475 14.0847 18.5018 15.1045 18.399C16.1244 18.2962 17.0769 17.8428 17.7997 17.116C18.0374 17.4875 18.3585 17.7985 18.7375 18.0241C19.1164 18.2498 19.5428 18.384 19.9827 18.416C20.0607 18.423 20.1397 18.426 20.2187 18.426C20.8595 18.4243 21.4824 18.2136 21.9927 17.826C22.5342 17.4031 22.9298 16.8212 23.1237 16.162C23.1577 16.051 23.2237 15.795 23.2237 15.794V15.784C23.3539 15.1985 23.4156 14.5998 23.4077 14C23.405 11.6826 22.4833 9.46079 20.8446 7.82211C19.2059 6.18342 16.9841 5.26165 14.6667 5.259Z" fill="#FF9E00" style="fill:#FF9E00;fill:color(display-p3 1.0000 0.6196 0.0000);fill-opacity:1;"/>
@@ -1367,52 +1635,52 @@ const Gt = {
   </defs>
 </svg>
   `
-}, Oe = {
+}, Gt = {
   height: 44,
   borderRadius: 8
-}, Yt = (e) => (n) => {
-  const t = e.lang || i.RUS, o = e.scheme || "light", r = e.borderRadius || Oe.borderRadius, s = e.height || Oe.height, u = s < 40 ? 24 : 28, h = s < 40 ? 6 : s < 48 ? 8 : 12, v = e.oauthList.map((m) => {
-    const p = t === i.RUS ? xe[t][m] : `${xe[t].replace("{provider}", Gt[m])}`;
+}, yn = (t) => (e) => {
+  const n = t.lang || r.RUS, o = t.scheme || "light", i = t.borderRadius || Gt.borderRadius, s = t.height || Gt.height, d = s < 40 ? 24 : 28, h = s < 40 ? 6 : s < 48 ? 8 : 12, p = t.oauthList.map((b) => {
+    const g = n === r.RUS ? zt[n][b] : `${zt[n].replace("{provider}", vn[b])}`;
     return `
-      <div class="VkIdSdk_oauth_item" data-oauth="${m}">
-        ${qt[m](u)}
-        <div class="VkIdSdk_oauth_button_text">${p}</div>
+      <div class="VkIdSdk_oauth_item" data-oauth="${b}">
+        ${Sn[b](d)}
+        <div class="VkIdSdk_oauth_button_text">${g}</div>
       </div>
     `;
   }).join(""), a = () => {
-    var f;
-    const m = document.querySelector(`#${n} .VkIdSdk_oauth_button_text`), p = document.querySelector(`#${n} .VkIdSdk_oauth_item`);
-    if (!m || !p)
+    var _;
+    const b = document.querySelector(`#${e} .VkIdSdk_oauth_button_text`), g = document.querySelector(`#${e} .VkIdSdk_oauth_item`);
+    if (!b || !g)
       return;
-    m.clientWidth >= p.clientWidth - u * 2 - 32 - h * 2 && ((f = document.querySelector(`#${n} .VkIdSdk_oauth_list`)) == null || f.removeAttribute("data-single-mode"));
+    b.clientWidth >= g.clientWidth - d * 2 - 32 - h * 2 && ((_ = document.querySelector(`#${e} .VkIdSdk_oauth_list`)) == null || _.removeAttribute("data-single-mode"));
   };
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", a) : setTimeout(a, 0);
-  const c = e.oauthList.length === 1 ? "data-single-mode" : "", S = jt[t];
+  const y = t.oauthList.length === 1 ? "data-single-mode" : "", c = bn[n];
   return `
-    <div id="${n}" class="VkIdSdk_oauth_container" data-test-id="oauthList" data-scheme="${o}">
+    <div id="${e}" class="VkIdSdk_oauth_container" data-test-id="oauthList" data-scheme="${o}">
       <style>
-        :root #${n}[data-scheme=light] {
+        :root #${e}[data-scheme=light] {
           --oauthlist--item_border_color: rgba(0, 0, 0, .12);
           --oauthlist--color_text_secondary: #818c99;
           --oauthlist--color_text_primary: #000;
         }
 
-        :root #${n}[data-scheme=dark] {
+        :root #${e}[data-scheme=dark] {
           --oauthlist--item_border_color: rgba(255, 255, 255, 0.12);
           --oauthlist--color_text_secondary: #76787a;
           --oauthlist--color_text_primary: #e1e3e6;
         }
 
-        #${n}.VkIdSdk_oauth_container {
+        #${e}.VkIdSdk_oauth_container {
           position: relative;
         }
 
-        #${n} .VkIdSdk_oauth_list {
+        #${e} .VkIdSdk_oauth_list {
           display: flex;
           height: ${s}px;
         }
 
-        #${n} .VkIdSdk_oauth_item {
+        #${e} .VkIdSdk_oauth_item {
           position: relative;
           display: flex;
           justify-content: center;
@@ -1421,15 +1689,15 @@ const Gt = {
           margin-right: 12px;
           width: 100%;
           border: 1px solid var(--oauthlist--item_border_color);
-          border-radius: ${r}px;
+          border-radius: ${i}px;
           cursor: pointer;
         }
 
-        #${n} .VkIdSdk_oauth_item:last-child {
+        #${e} .VkIdSdk_oauth_item:last-child {
           margin-right: 0;
         }
 
-        #${n} .VkIdSdk_oauth_link_text {
+        #${e} .VkIdSdk_oauth_link_text {
           display: flex;
           font-family: -apple-system, system-ui, "Helvetica Neue", Roboto, sans-serif;
           color: var(--oauthlist--color_text_secondary);
@@ -1440,7 +1708,7 @@ const Gt = {
           text-align: center;
         }
 
-        #${n} .VkIdSdk_spinner {
+        #${e} .VkIdSdk_spinner {
           position: absolute;
           display: flex;
           justify-content: center;
@@ -1450,28 +1718,28 @@ const Gt = {
           background: #fff;
         }
 
-        #${n}[data-state=loaded] .VkIdSdk_spinner {
+        #${e}[data-state=loaded] .VkIdSdk_spinner {
           transition: .2s;
           opacity: 0;
           pointer-events: none;
         }
 
-        #${n} .VkIdSdk_spinner > svg {
+        #${e} .VkIdSdk_spinner > svg {
           animation: vkIdSdkButtonSpinner 0.7s linear infinite;
         }
 
-        #${n} .VkIdSdk_oauth_button_text {
+        #${e} .VkIdSdk_oauth_button_text {
           display: none;
           font-family: -apple-system, system-ui, "Helvetica Neue", Roboto, sans-serif;
           color: var(--oauthlist--color_text_primary);
         }
 
-        #${n} .VkIdSdk_oauth_list[data-single-mode] .VkIdSdk_oauth_item svg {
+        #${e} .VkIdSdk_oauth_list[data-single-mode] .VkIdSdk_oauth_item svg {
           position: absolute;
           left: 16px;
         }
 
-        #${n} .VkIdSdk_oauth_list[data-single-mode] .VkIdSdk_oauth_button_text {
+        #${e} .VkIdSdk_oauth_list[data-single-mode] .VkIdSdk_oauth_button_text {
           display: block;
         }
 
@@ -1485,72 +1753,390 @@ const Gt = {
         }
       </style>
       <div class="VkIdSdk_spinner">
-        ${Zt}
+        ${mn}
       </div>
-      <div class="VkIdSdk_oauth_link_text">${S}</div>
-      <div class="VkIdSdk_oauth_list" ${c}>${v}</div>
+      <div class="VkIdSdk_oauth_link_text">${c}</div>
+      <div class="VkIdSdk_oauth_list" ${y}>${p}</div>
     </div>
   `;
 };
-function Xt(e, n, t, o) {
-  var r = arguments.length, s = r < 3 ? n : o === null ? o = Object.getOwnPropertyDescriptor(n, t) : o, u;
-  if (typeof Reflect == "object" && typeof Reflect.decorate == "function") s = Reflect.decorate(e, n, t, o);
-  else for (var h = e.length - 1; h >= 0; h--) (u = e[h]) && (s = (r < 3 ? u(s) : r > 3 ? u(n, t, s) : u(n, t)) || s);
-  return r > 3 && s && Object.defineProperty(n, t, s), s;
+function En(t, e, n, o) {
+  var i = arguments.length, s = i < 3 ? e : o === null ? o = Object.getOwnPropertyDescriptor(e, n) : o, d;
+  if (typeof Reflect == "object" && typeof Reflect.decorate == "function") s = Reflect.decorate(t, e, n, o);
+  else for (var h = t.length - 1; h >= 0; h--) (d = t[h]) && (s = (i < 3 ? d(s) : i > 3 ? d(e, n, s) : d(e, n)) || s);
+  return i > 3 && s && Object.defineProperty(e, n, s), s;
 }
-class Z extends H {
+class z extends G {
+  constructor() {
+    super();
+    u(this, "analytics");
+    u(this, "providers");
+    u(this, "flowSource");
+    u(this, "uniqueSessionId");
+    this.analytics = new gn(this.config);
+  }
+  sendStartAnalytics() {
+    const n = new Set(this.providers);
+    this.analytics.sendMultibrandingOauthAdded({
+      screen: this.flowSource,
+      fields: [
+        {
+          name: st.VK,
+          value: (+n.has(C.VK)).toString()
+        },
+        {
+          name: st.OK,
+          value: (+n.has(C.OK)).toString()
+        },
+        {
+          name: st.MAIL,
+          value: (+n.has(C.MAIL)).toString()
+        }
+      ]
+    }), n.has(C.VK) && this.analytics.sendVkButtonShow({
+      screen: this.flowSource,
+      isIcon: n.size > 1
+    }), n.has(C.OK) && this.analytics.sendOkButtonShow({
+      screen: this.flowSource,
+      isIcon: n.size > 1
+    }), n.has(C.MAIL) && this.analytics.sendMailButtonShow({
+      screen: this.flowSource,
+      isIcon: n.size > 1
+    });
+  }
   render(n) {
-    var t, o;
-    return this.templateRenderer = Yt({
-      lang: n.lang,
+    var o, i;
+    return this.lang = (n == null ? void 0 : n.lang) || r.RUS, this.scheme = (n == null ? void 0 : n.scheme) || nt.LIGHT, this.providers = n.oauthList, this.flowSource = (n == null ? void 0 : n.flowSource) || N.MULTIBRANDING, this.uniqueSessionId = (n == null ? void 0 : n.uniqueSessionId) || this.id, this.analytics.setUniqueSessionId(this.uniqueSessionId), this.templateRenderer = yn({
+      lang: this.lang,
       oauthList: n.oauthList,
-      height: (t = n.styles) == null ? void 0 : t.height,
-      borderRadius: (o = n.styles) == null ? void 0 : o.borderRadius,
-      scheme: n.scheme
-    }), this.container = n.container, this.renderTemplate(), this.registerElements(), this.setState(M.LOADED), this.elements.root.addEventListener("click", this.handleClick.bind(this)), this;
+      height: (o = n.styles) == null ? void 0 : o.height,
+      borderRadius: (i = n.styles) == null ? void 0 : i.borderRadius,
+      scheme: this.scheme
+    }), this.container = n.container, this.renderTemplate(), this.registerElements(), this.setState(H.LOADED), this.sendStartAnalytics(), this.elements.root.addEventListener("click", this.handleClick.bind(this)), this;
   }
   handleClick(n) {
-    const t = n.target.closest("[data-oauth]");
-    if (!t)
+    const o = n.target.closest("[data-oauth]");
+    if (!o)
       return;
-    const o = t.getAttribute("data-oauth");
-    Z.__auth.login({
-      action: {
-        name: "sdk_oauth",
-        params: {
-          oauth: o
+    const i = o.getAttribute("data-oauth"), s = {
+      lang: this.lang,
+      scheme: this.scheme,
+      provider: i,
+      statsFlowSource: P.MULTIBRANDING,
+      uniqueSessionId: this.uniqueSessionId
+    };
+    switch (i) {
+      case C.VK:
+        this.analytics.sendVkButtonTap({
+          screen: this.flowSource,
+          isIcon: this.providers.length > 1
+        }).finally(() => {
+          z.auth.login(s).catch((d) => {
+            this.events.emit($.ERROR, {
+              code: U.AuthError,
+              text: d.error
+            });
+          });
+        });
+        break;
+      case C.OK:
+        this.analytics.sendOkButtonTap({
+          screen: this.flowSource,
+          isIcon: this.providers.length > 1
+        }).finally(() => {
+          z.auth.login(s).catch((d) => {
+            this.events.emit($.ERROR, {
+              code: U.AuthError,
+              text: d.error
+            });
+          });
+        });
+        break;
+      case C.MAIL:
+        this.analytics.sendMailButtonTap({
+          screen: this.flowSource,
+          isIcon: this.providers.length > 1
+        }).finally(() => {
+          z.auth.login(s).catch((d) => {
+            this.events.emit($.ERROR, {
+              code: U.AuthError,
+              text: d.error
+            });
+          });
+        });
+        break;
+    }
+  }
+}
+En([
+  ft({
+    oauthList: [
+      qe
+    ]
+  })
+], z.prototype, "render", null);
+const In = "s256", D = class D {
+  constructor() {
+    u(this, "dataService");
+    u(this, "opener");
+    u(this, "interval");
+    u(this, "id", le());
+    u(this, "analytics");
+    u(this, "close", () => {
+      this.opener && this.opener.close();
+    });
+    u(this, "handleMessage", ({ origin: e, source: n, data: o }) => {
+      if (!(n !== this.opener || !this.opener || !Xe(e))) {
+        if (this.unsubscribe(), o.payload.error) {
+          this.dataService.sendAuthorizationFailed(o.payload.error);
+          return;
         }
+        if (o.action === We + K()) {
+          K() !== o.payload.state ? this.dataService.sendStateMismatchError() : this.dataService.sendSuccessData(o.payload);
+          return;
+        }
+        this.dataService.sendEventNotSupported();
       }
+    });
+    u(this, "handleInterval", () => {
+      var e;
+      (e = this.opener) != null && e.closed && (this.unsubscribe(), this.dataService.sendNewTabHasBeenClosed());
+    });
+    u(this, "subscribe", () => {
+      this.interval = window.setInterval(this.handleInterval, 1e3), window.addEventListener("message", this.handleMessage), this.dataService.removeCallback();
+    });
+    u(this, "unsubscribe", () => {
+      window.removeEventListener("message", this.handleMessage), clearInterval(this.interval), this.dataService.setCallback(this.close);
+    });
+    u(this, "loginInNewTab", (e) => (this.dataService = new ze(), this.opener = window.open(e, "_blank"), this.opener ? this.subscribe() : this.dataService.sendCannotCreateNewTab(), this.dataService.value.then((n) => {
+      Pt(), D.config.update({
+        state: D.config.get().state
+      }), this.redirectWithPayload(n);
+    })));
+    u(this, "loginByRedirect", (e) => (location.assign(e), Promise.resolve()));
+    u(this, "login", (e) => {
+      const n = D.config.get(), { scope: o, app: i, codeChallenge: s, prompt: d } = n, h = (e == null ? void 0 : e.statsFlowSource) || P.AUTH, p = (e == null ? void 0 : e.uniqueSessionId) || this.id;
+      h === P.AUTH && this.analytics.setUniqueSessionId(p), At(n.codeVerifier), K(n.state);
+      const a = [
+        ...d
+      ];
+      Object.values(Vt).includes(e == null ? void 0 : e.provider) && a.unshift(lt.Login);
+      const c = {
+        lang_id: e == null ? void 0 : e.lang,
+        scheme: e == null ? void 0 : e.scheme,
+        code_challenge: s || cn(At()),
+        code_challenge_method: In,
+        client_id: i,
+        response_type: Fe,
+        scope: o,
+        state: K(),
+        provider: e == null ? void 0 : e.provider,
+        prompt: a.join(" ").trim(),
+        stats_info: ln({
+          flow_source: h,
+          session_id: p
+        })
+      };
+      let b = Rt("authorize", c, n);
+      return e != null && e.screen && (Object.assign(c, {
+        oauth_version: 2,
+        screen: e == null ? void 0 : e.screen,
+        redirect_state: K()
+      }), b = Rt("auth", c, n)), n.mode === ct.InNewTab ? (h === P.AUTH && this.analytics.sendCustomAuthStart(e == null ? void 0 : e.provider), c.origin = location.protocol + "//" + location.hostname, this.loginInNewTab(b)) : h === P.AUTH ? this.analytics.sendCustomAuthStart(e == null ? void 0 : e.provider).finally(() => {
+        this.loginByRedirect(b);
+      }) : this.loginByRedirect(b);
+    });
+    this.analytics = new De(D.config);
+  }
+  checkState(e) {
+    if (K() !== e)
+      return {
+        code: V.StateMismatch,
+        error: X[V.StateMismatch],
+        state: e
+      };
+    Pt();
+  }
+  exchangeCode(e, n) {
+    const o = D.config.get();
+    K(o.state);
+    const i = {
+      grant_type: "authorization_code",
+      redirect_uri: o.redirectUrl,
+      client_id: o.app,
+      code_verifier: At(),
+      state: K(),
+      device_id: n
+    }, s = Y.stringify(i);
+    return fetch(`https://${o.__vkidDomain}/oauth2/auth?${s}`, {
+      method: "POST",
+      body: new URLSearchParams({
+        code: e
+      })
+    }).then((d) => this.oauthSectionFetchHandler(d)).then((d) => {
+      const h = this.checkState(d.state);
+      if (h)
+        throw h;
+      return He(), D.config.update({
+        state: o.state,
+        codeVerifier: o.codeVerifier
+      }), d;
+    });
+  }
+  refreshToken(e, n) {
+    const o = D.config.get();
+    K(o.state);
+    const i = {
+      grant_type: "refresh_token",
+      redirect_uri: o.redirectUrl,
+      client_id: o.app,
+      device_id: n,
+      state: K()
+    }, s = Y.stringify(i);
+    return fetch(`https://${o.__vkidDomain}/oauth2/auth?${s}`, {
+      method: "POST",
+      body: new URLSearchParams({
+        refresh_token: e
+      })
+    }).then((d) => this.oauthSectionFetchHandler(d)).then((d) => {
+      const h = this.checkState(d.state);
+      if (h)
+        throw h;
+      return D.config.update({
+        state: o.state
+      }), d;
+    });
+  }
+  logout(e) {
+    const n = D.config.get(), o = {
+      client_id: n.app
+    }, i = Y.stringify(o);
+    return fetch(`https://${n.__vkidDomain}/oauth2/logout?${i}`, {
+      method: "POST",
+      body: new URLSearchParams({
+        access_token: e
+      })
+    }).then((s) => this.oauthSectionFetchHandler(s));
+  }
+  userInfo(e) {
+    const n = D.config.get(), o = {
+      client_id: n.app
+    }, i = Y.stringify(o);
+    return fetch(`https://${n.__vkidDomain}/oauth2/user_info?${i}`, {
+      method: "POST",
+      body: new URLSearchParams({
+        access_token: e
+      })
+    }).then((s) => this.oauthSectionFetchHandler(s));
+  }
+  publicInfo(e) {
+    const n = D.config.get(), o = {
+      client_id: n.app
+    }, i = Y.stringify(o);
+    return fetch(`https://${n.__vkidDomain}/oauth2/public_info?${i}`, {
+      method: "POST",
+      body: new URLSearchParams({
+        id_token: e
+      })
+    }).then((s) => this.oauthSectionFetchHandler(s));
+  }
+  oauthSectionFetchHandler(e) {
+    return e.json().then((n) => {
+      if ("error" in n)
+        throw n;
+      return n;
+    });
+  }
+  redirectWithPayload(e) {
+    location.assign(ce(e, D.config));
+  }
+};
+/**
+* @ignore
+*/
+u(D, "config");
+let bt = D;
+class kn {
+  constructor(e) {
+    u(this, "registrationStatsCollector");
+    u(this, "uniqueSessionId");
+    const n = new q(e), o = new ht(n);
+    this.registrationStatsCollector = new Et(o);
+  }
+  setUniqueSessionId(e) {
+    this.uniqueSessionId = e;
+  }
+  getFields() {
+    const e = [
+      {
+        name: "sdk_type",
+        value: "vkid"
+      }
+    ];
+    return this.uniqueSessionId && e.push({
+      name: "unique_session_id",
+      value: this.uniqueSessionId
+    }), e;
+  }
+  sendFrameLoadingFailed() {
+    this.registrationStatsCollector.logEvent(N.NOWHERE, {
+      event_type: "iframe_loading_failed",
+      fields: this.getFields()
+    });
+  }
+  sendNoSessionFound() {
+    this.registrationStatsCollector.logEvent(N.NOWHERE, {
+      event_type: "no_session_found",
+      fields: this.getFields()
+    });
+  }
+  sendOneTapButtonNoUserShow(e = "default") {
+    this.registrationStatsCollector.logEvent(N.NOWHERE, {
+      event_type: "onetap_button_no_user_show",
+      fields: [
+        ...this.getFields(),
+        {
+          name: "button_type",
+          value: e
+        }
+      ]
+    });
+  }
+  sendOneTapButtonNoUserTap(e = "default") {
+    return this.registrationStatsCollector.logEvent(N.NOWHERE, {
+      event_type: "onetap_button_no_user_tap",
+      fields: [
+        ...this.getFields(),
+        {
+          name: "button_type",
+          value: e
+        }
+      ]
+    });
+  }
+  sendScreenProceed() {
+    this.registrationStatsCollector.logEvent(N.NOWHERE, {
+      event_type: "screen_proceed",
+      fields: this.getFields()
     });
   }
 }
-Xt([
-  de({
-    oauthList: [
-      xt
-    ]
-  })
-], Z.prototype, "render", null);
-var K;
-(function(e) {
-  e.LOGIN_SUCCESS = "onetap: success login", e.SHOW_FULL_AUTH = "onetap: show full auth", e.SHOW_AGREEMENTS_DIALOG = "onetap: show agreements dialog", e.START_AUTHORIZE = "onetap: start authorize", e.NOT_AUTHORIZED = "onetap: not authorized";
-})(K || (K = {}));
-var Ge = function() {
+var ue = function() {
   if (typeof Map < "u")
     return Map;
-  function e(n, t) {
+  function t(e, n) {
     var o = -1;
-    return n.some(function(r, s) {
-      return r[0] === t ? (o = s, !0) : !1;
+    return e.some(function(i, s) {
+      return i[0] === n ? (o = s, !0) : !1;
     }), o;
   }
   return (
     /** @class */
     function() {
-      function n() {
+      function e() {
         this.__entries__ = [];
       }
-      return Object.defineProperty(n.prototype, "size", {
+      return Object.defineProperty(e.prototype, "size", {
         /**
          * @returns {boolean}
          */
@@ -1559,348 +2145,354 @@ var Ge = function() {
         },
         enumerable: !0,
         configurable: !0
-      }), n.prototype.get = function(t) {
-        var o = e(this.__entries__, t), r = this.__entries__[o];
-        return r && r[1];
-      }, n.prototype.set = function(t, o) {
-        var r = e(this.__entries__, t);
-        ~r ? this.__entries__[r][1] = o : this.__entries__.push([t, o]);
-      }, n.prototype.delete = function(t) {
-        var o = this.__entries__, r = e(o, t);
-        ~r && o.splice(r, 1);
-      }, n.prototype.has = function(t) {
-        return !!~e(this.__entries__, t);
-      }, n.prototype.clear = function() {
+      }), e.prototype.get = function(n) {
+        var o = t(this.__entries__, n), i = this.__entries__[o];
+        return i && i[1];
+      }, e.prototype.set = function(n, o) {
+        var i = t(this.__entries__, n);
+        ~i ? this.__entries__[i][1] = o : this.__entries__.push([n, o]);
+      }, e.prototype.delete = function(n) {
+        var o = this.__entries__, i = t(o, n);
+        ~i && o.splice(i, 1);
+      }, e.prototype.has = function(n) {
+        return !!~t(this.__entries__, n);
+      }, e.prototype.clear = function() {
         this.__entries__.splice(0);
-      }, n.prototype.forEach = function(t, o) {
+      }, e.prototype.forEach = function(n, o) {
         o === void 0 && (o = null);
-        for (var r = 0, s = this.__entries__; r < s.length; r++) {
-          var u = s[r];
-          t.call(o, u[1], u[0]);
+        for (var i = 0, s = this.__entries__; i < s.length; i++) {
+          var d = s[i];
+          n.call(o, d[1], d[0]);
         }
-      }, n;
+      }, e;
     }()
   );
-}(), be = typeof window < "u" && typeof document < "u" && window.document === document, ce = function() {
+}(), xt = typeof window < "u" && typeof document < "u" && window.document === document, mt = function() {
   return typeof global < "u" && global.Math === Math ? global : typeof self < "u" && self.Math === Math ? self : typeof window < "u" && window.Math === Math ? window : Function("return this")();
-}(), Jt = function() {
-  return typeof requestAnimationFrame == "function" ? requestAnimationFrame.bind(ce) : function(e) {
+}(), An = function() {
+  return typeof requestAnimationFrame == "function" ? requestAnimationFrame.bind(mt) : function(t) {
     return setTimeout(function() {
-      return e(Date.now());
+      return t(Date.now());
     }, 1e3 / 60);
   };
-}(), Qt = 2;
-function en(e, n) {
-  var t = !1, o = !1, r = 0;
+}(), Cn = 2;
+function wn(t, e) {
+  var n = !1, o = !1, i = 0;
   function s() {
-    t && (t = !1, e()), o && h();
+    n && (n = !1, t()), o && h();
   }
-  function u() {
-    Jt(s);
+  function d() {
+    An(s);
   }
   function h() {
-    var v = Date.now();
-    if (t) {
-      if (v - r < Qt)
+    var p = Date.now();
+    if (n) {
+      if (p - i < Cn)
         return;
       o = !0;
     } else
-      t = !0, o = !1, setTimeout(u, n);
-    r = v;
+      n = !0, o = !1, setTimeout(d, e);
+    i = p;
   }
   return h;
 }
-var tn = 20, nn = ["top", "right", "bottom", "left", "width", "height", "size", "weight"], on = typeof MutationObserver < "u", rn = (
+var Tn = 20, On = ["top", "right", "bottom", "left", "width", "height", "size", "weight"], Rn = typeof MutationObserver < "u", Vn = (
   /** @class */
   function() {
-    function e() {
-      this.connected_ = !1, this.mutationEventsAdded_ = !1, this.mutationsObserver_ = null, this.observers_ = [], this.onTransitionEnd_ = this.onTransitionEnd_.bind(this), this.refresh = en(this.refresh.bind(this), tn);
+    function t() {
+      this.connected_ = !1, this.mutationEventsAdded_ = !1, this.mutationsObserver_ = null, this.observers_ = [], this.onTransitionEnd_ = this.onTransitionEnd_.bind(this), this.refresh = wn(this.refresh.bind(this), Tn);
     }
-    return e.prototype.addObserver = function(n) {
-      ~this.observers_.indexOf(n) || this.observers_.push(n), this.connected_ || this.connect_();
-    }, e.prototype.removeObserver = function(n) {
-      var t = this.observers_, o = t.indexOf(n);
-      ~o && t.splice(o, 1), !t.length && this.connected_ && this.disconnect_();
-    }, e.prototype.refresh = function() {
-      var n = this.updateObservers_();
-      n && this.refresh();
-    }, e.prototype.updateObservers_ = function() {
-      var n = this.observers_.filter(function(t) {
-        return t.gatherActive(), t.hasActive();
+    return t.prototype.addObserver = function(e) {
+      ~this.observers_.indexOf(e) || this.observers_.push(e), this.connected_ || this.connect_();
+    }, t.prototype.removeObserver = function(e) {
+      var n = this.observers_, o = n.indexOf(e);
+      ~o && n.splice(o, 1), !n.length && this.connected_ && this.disconnect_();
+    }, t.prototype.refresh = function() {
+      var e = this.updateObservers_();
+      e && this.refresh();
+    }, t.prototype.updateObservers_ = function() {
+      var e = this.observers_.filter(function(n) {
+        return n.gatherActive(), n.hasActive();
       });
-      return n.forEach(function(t) {
-        return t.broadcastActive();
-      }), n.length > 0;
-    }, e.prototype.connect_ = function() {
-      !be || this.connected_ || (document.addEventListener("transitionend", this.onTransitionEnd_), window.addEventListener("resize", this.refresh), on ? (this.mutationsObserver_ = new MutationObserver(this.refresh), this.mutationsObserver_.observe(document, {
+      return e.forEach(function(n) {
+        return n.broadcastActive();
+      }), e.length > 0;
+    }, t.prototype.connect_ = function() {
+      !xt || this.connected_ || (document.addEventListener("transitionend", this.onTransitionEnd_), window.addEventListener("resize", this.refresh), Rn ? (this.mutationsObserver_ = new MutationObserver(this.refresh), this.mutationsObserver_.observe(document, {
         attributes: !0,
         childList: !0,
         characterData: !0,
         subtree: !0
       })) : (document.addEventListener("DOMSubtreeModified", this.refresh), this.mutationEventsAdded_ = !0), this.connected_ = !0);
-    }, e.prototype.disconnect_ = function() {
-      !be || !this.connected_ || (document.removeEventListener("transitionend", this.onTransitionEnd_), window.removeEventListener("resize", this.refresh), this.mutationsObserver_ && this.mutationsObserver_.disconnect(), this.mutationEventsAdded_ && document.removeEventListener("DOMSubtreeModified", this.refresh), this.mutationsObserver_ = null, this.mutationEventsAdded_ = !1, this.connected_ = !1);
-    }, e.prototype.onTransitionEnd_ = function(n) {
-      var t = n.propertyName, o = t === void 0 ? "" : t, r = nn.some(function(s) {
+    }, t.prototype.disconnect_ = function() {
+      !xt || !this.connected_ || (document.removeEventListener("transitionend", this.onTransitionEnd_), window.removeEventListener("resize", this.refresh), this.mutationsObserver_ && this.mutationsObserver_.disconnect(), this.mutationEventsAdded_ && document.removeEventListener("DOMSubtreeModified", this.refresh), this.mutationsObserver_ = null, this.mutationEventsAdded_ = !1, this.connected_ = !1);
+    }, t.prototype.onTransitionEnd_ = function(e) {
+      var n = e.propertyName, o = n === void 0 ? "" : n, i = On.some(function(s) {
         return !!~o.indexOf(s);
       });
-      r && this.refresh();
-    }, e.getInstance = function() {
-      return this.instance_ || (this.instance_ = new e()), this.instance_;
-    }, e.instance_ = null, e;
+      i && this.refresh();
+    }, t.getInstance = function() {
+      return this.instance_ || (this.instance_ = new t()), this.instance_;
+    }, t.instance_ = null, t;
   }()
-), je = function(e, n) {
-  for (var t = 0, o = Object.keys(n); t < o.length; t++) {
-    var r = o[t];
-    Object.defineProperty(e, r, {
-      value: n[r],
+), he = function(t, e) {
+  for (var n = 0, o = Object.keys(e); n < o.length; n++) {
+    var i = o[n];
+    Object.defineProperty(t, i, {
+      value: e[i],
       enumerable: !1,
       writable: !1,
       configurable: !0
     });
   }
-  return e;
-}, j = function(e) {
-  var n = e && e.ownerDocument && e.ownerDocument.defaultView;
-  return n || ce;
-}, Ze = ue(0, 0, 0, 0);
-function le(e) {
-  return parseFloat(e) || 0;
+  return t;
+}, ot = function(t) {
+  var e = t && t.ownerDocument && t.ownerDocument.defaultView;
+  return e || mt;
+}, fe = It(0, 0, 0, 0);
+function St(t) {
+  return parseFloat(t) || 0;
 }
-function Te(e) {
-  for (var n = [], t = 1; t < arguments.length; t++)
-    n[t - 1] = arguments[t];
-  return n.reduce(function(o, r) {
-    var s = e["border-" + r + "-width"];
-    return o + le(s);
+function jt(t) {
+  for (var e = [], n = 1; n < arguments.length; n++)
+    e[n - 1] = arguments[n];
+  return e.reduce(function(o, i) {
+    var s = t["border-" + i + "-width"];
+    return o + St(s);
   }, 0);
 }
-function sn(e) {
-  for (var n = ["top", "right", "bottom", "left"], t = {}, o = 0, r = n; o < r.length; o++) {
-    var s = r[o], u = e["padding-" + s];
-    t[s] = le(u);
+function xn(t) {
+  for (var e = ["top", "right", "bottom", "left"], n = {}, o = 0, i = e; o < i.length; o++) {
+    var s = i[o], d = t["padding-" + s];
+    n[s] = St(d);
   }
-  return t;
+  return n;
 }
-function an(e) {
-  var n = e.getBBox();
-  return ue(0, 0, n.width, n.height);
+function $n(t) {
+  var e = t.getBBox();
+  return It(0, 0, e.width, e.height);
 }
-function cn(e) {
-  var n = e.clientWidth, t = e.clientHeight;
-  if (!n && !t)
-    return Ze;
-  var o = j(e).getComputedStyle(e), r = sn(o), s = r.left + r.right, u = r.top + r.bottom, h = le(o.width), v = le(o.height);
-  if (o.boxSizing === "border-box" && (Math.round(h + s) !== n && (h -= Te(o, "left", "right") + s), Math.round(v + u) !== t && (v -= Te(o, "top", "bottom") + u)), !dn(e)) {
-    var a = Math.round(h + s) - n, c = Math.round(v + u) - t;
-    Math.abs(a) !== 1 && (h -= a), Math.abs(c) !== 1 && (v -= c);
+function Nn(t) {
+  var e = t.clientWidth, n = t.clientHeight;
+  if (!e && !n)
+    return fe;
+  var o = ot(t).getComputedStyle(t), i = xn(o), s = i.left + i.right, d = i.top + i.bottom, h = St(o.width), p = St(o.height);
+  if (o.boxSizing === "border-box" && (Math.round(h + s) !== e && (h -= jt(o, "left", "right") + s), Math.round(p + d) !== n && (p -= jt(o, "top", "bottom") + d)), !Dn(t)) {
+    var a = Math.round(h + s) - e, y = Math.round(p + d) - n;
+    Math.abs(a) !== 1 && (h -= a), Math.abs(y) !== 1 && (p -= y);
   }
-  return ue(r.left, r.top, h, v);
+  return It(i.left, i.top, h, p);
 }
-var ln = /* @__PURE__ */ function() {
-  return typeof SVGGraphicsElement < "u" ? function(e) {
-    return e instanceof j(e).SVGGraphicsElement;
-  } : function(e) {
-    return e instanceof j(e).SVGElement && typeof e.getBBox == "function";
+var Ln = /* @__PURE__ */ function() {
+  return typeof SVGGraphicsElement < "u" ? function(t) {
+    return t instanceof ot(t).SVGGraphicsElement;
+  } : function(t) {
+    return t instanceof ot(t).SVGElement && typeof t.getBBox == "function";
   };
 }();
-function dn(e) {
-  return e === j(e).document.documentElement;
+function Dn(t) {
+  return t === ot(t).document.documentElement;
 }
-function un(e) {
-  return be ? ln(e) ? an(e) : cn(e) : Ze;
+function Mn(t) {
+  return xt ? Ln(t) ? $n(t) : Nn(t) : fe;
 }
-function hn(e) {
-  var n = e.x, t = e.y, o = e.width, r = e.height, s = typeof DOMRectReadOnly < "u" ? DOMRectReadOnly : Object, u = Object.create(s.prototype);
-  return je(u, {
-    x: n,
-    y: t,
+function Un(t) {
+  var e = t.x, n = t.y, o = t.width, i = t.height, s = typeof DOMRectReadOnly < "u" ? DOMRectReadOnly : Object, d = Object.create(s.prototype);
+  return he(d, {
+    x: e,
+    y: n,
     width: o,
-    height: r,
-    top: t,
-    right: n + o,
-    bottom: r + t,
-    left: n
-  }), u;
+    height: i,
+    top: n,
+    right: e + o,
+    bottom: i + n,
+    left: e
+  }), d;
 }
-function ue(e, n, t, o) {
-  return { x: e, y: n, width: t, height: o };
+function It(t, e, n, o) {
+  return { x: t, y: e, width: n, height: o };
 }
-var fn = (
+var Bn = (
   /** @class */
   function() {
-    function e(n) {
-      this.broadcastWidth = 0, this.broadcastHeight = 0, this.contentRect_ = ue(0, 0, 0, 0), this.target = n;
+    function t(e) {
+      this.broadcastWidth = 0, this.broadcastHeight = 0, this.contentRect_ = It(0, 0, 0, 0), this.target = e;
     }
-    return e.prototype.isActive = function() {
-      var n = un(this.target);
-      return this.contentRect_ = n, n.width !== this.broadcastWidth || n.height !== this.broadcastHeight;
-    }, e.prototype.broadcastRect = function() {
-      var n = this.contentRect_;
-      return this.broadcastWidth = n.width, this.broadcastHeight = n.height, n;
-    }, e;
+    return t.prototype.isActive = function() {
+      var e = Mn(this.target);
+      return this.contentRect_ = e, e.width !== this.broadcastWidth || e.height !== this.broadcastHeight;
+    }, t.prototype.broadcastRect = function() {
+      var e = this.contentRect_;
+      return this.broadcastWidth = e.width, this.broadcastHeight = e.height, e;
+    }, t;
   }()
-), _n = (
+), Kn = (
   /** @class */
   /* @__PURE__ */ function() {
-    function e(n, t) {
-      var o = hn(t);
-      je(this, { target: n, contentRect: o });
+    function t(e, n) {
+      var o = Un(n);
+      he(this, { target: e, contentRect: o });
     }
-    return e;
+    return t;
   }()
-), pn = (
+), Pn = (
   /** @class */
   function() {
-    function e(n, t, o) {
-      if (this.activeObservations_ = [], this.observations_ = new Ge(), typeof n != "function")
+    function t(e, n, o) {
+      if (this.activeObservations_ = [], this.observations_ = new ue(), typeof e != "function")
         throw new TypeError("The callback provided as parameter 1 is not a function.");
-      this.callback_ = n, this.controller_ = t, this.callbackCtx_ = o;
+      this.callback_ = e, this.controller_ = n, this.callbackCtx_ = o;
     }
-    return e.prototype.observe = function(n) {
+    return t.prototype.observe = function(e) {
       if (!arguments.length)
         throw new TypeError("1 argument required, but only 0 present.");
       if (!(typeof Element > "u" || !(Element instanceof Object))) {
-        if (!(n instanceof j(n).Element))
+        if (!(e instanceof ot(e).Element))
           throw new TypeError('parameter 1 is not of type "Element".');
-        var t = this.observations_;
-        t.has(n) || (t.set(n, new fn(n)), this.controller_.addObserver(this), this.controller_.refresh());
+        var n = this.observations_;
+        n.has(e) || (n.set(e, new Bn(e)), this.controller_.addObserver(this), this.controller_.refresh());
       }
-    }, e.prototype.unobserve = function(n) {
+    }, t.prototype.unobserve = function(e) {
       if (!arguments.length)
         throw new TypeError("1 argument required, but only 0 present.");
       if (!(typeof Element > "u" || !(Element instanceof Object))) {
-        if (!(n instanceof j(n).Element))
+        if (!(e instanceof ot(e).Element))
           throw new TypeError('parameter 1 is not of type "Element".');
-        var t = this.observations_;
-        t.has(n) && (t.delete(n), t.size || this.controller_.removeObserver(this));
+        var n = this.observations_;
+        n.has(e) && (n.delete(e), n.size || this.controller_.removeObserver(this));
       }
-    }, e.prototype.disconnect = function() {
+    }, t.prototype.disconnect = function() {
       this.clearActive(), this.observations_.clear(), this.controller_.removeObserver(this);
-    }, e.prototype.gatherActive = function() {
-      var n = this;
-      this.clearActive(), this.observations_.forEach(function(t) {
-        t.isActive() && n.activeObservations_.push(t);
+    }, t.prototype.gatherActive = function() {
+      var e = this;
+      this.clearActive(), this.observations_.forEach(function(n) {
+        n.isActive() && e.activeObservations_.push(n);
       });
-    }, e.prototype.broadcastActive = function() {
+    }, t.prototype.broadcastActive = function() {
       if (this.hasActive()) {
-        var n = this.callbackCtx_, t = this.activeObservations_.map(function(o) {
-          return new _n(o.target, o.broadcastRect());
+        var e = this.callbackCtx_, n = this.activeObservations_.map(function(o) {
+          return new Kn(o.target, o.broadcastRect());
         });
-        this.callback_.call(n, t, n), this.clearActive();
+        this.callback_.call(e, n, e), this.clearActive();
       }
-    }, e.prototype.clearActive = function() {
+    }, t.prototype.clearActive = function() {
       this.activeObservations_.splice(0);
-    }, e.prototype.hasActive = function() {
+    }, t.prototype.hasActive = function() {
       return this.activeObservations_.length > 0;
-    }, e;
+    }, t;
   }()
-), qe = typeof WeakMap < "u" ? /* @__PURE__ */ new WeakMap() : new Ge(), Ye = (
+), _e = typeof WeakMap < "u" ? /* @__PURE__ */ new WeakMap() : new ue(), pe = (
   /** @class */
   /* @__PURE__ */ function() {
-    function e(n) {
-      if (!(this instanceof e))
+    function t(e) {
+      if (!(this instanceof t))
         throw new TypeError("Cannot call a class as a function.");
       if (!arguments.length)
         throw new TypeError("1 argument required, but only 0 present.");
-      var t = rn.getInstance(), o = new pn(n, t, this);
-      qe.set(this, o);
+      var n = Vn.getInstance(), o = new Pn(e, n, this);
+      _e.set(this, o);
     }
-    return e;
+    return t;
   }()
 );
 [
   "observe",
   "unobserve",
   "disconnect"
-].forEach(function(e) {
-  Ye.prototype[e] = function() {
-    var n;
-    return (n = qe.get(this))[e].apply(n, arguments);
+].forEach(function(t) {
+  pe.prototype[t] = function() {
+    var e;
+    return (e = _e.get(this))[t].apply(e, arguments);
   };
 });
-var gn = function() {
-  return typeof ce.ResizeObserver < "u" ? ce.ResizeObserver : Ye;
+var Hn = function() {
+  return typeof mt.ResizeObserver < "u" ? mt.ResizeObserver : pe;
 }();
-const vn = (e) => {
-  const n = (e - 30) / 2 + 3;
-  return e < 40 ? n : n - 2;
-}, bn = (e) => e < 40 ? 14 : e > 47 ? 17 : 16, mn = (e) => e < 40 ? 24 : 28, yn = "VK ID", Sn = {
-  [i.RUS]: "Войти c VK ID",
-  [i.UKR]: "Увійти з VK ID",
-  [i.ENG]: "Sign in with VK ID",
-  [i.SPA]: "Iniciar sesión con VK ID",
-  [i.GERMAN]: "Mit VK-ID anmelden",
-  [i.POL]: "Wejdź z VK ID",
-  [i.FRA]: "Se connecter avec VK ID",
-  [i.TURKEY]: "VK ID aracılığıyla gir"
-}, kn = {
-  [i.RUS]: "Продолжить",
-  [i.UKR]: "Продовжити",
-  [i.ENG]: "Continue",
-  [i.SPA]: "Continuar",
-  [i.GERMAN]: "Fortfahren",
-  [i.POL]: "Kontynuuj",
-  [i.FRA]: "Continuer",
-  [i.TURKEY]: "Devam"
-}, Cn = `
+const Fn = (t) => {
+  const e = (t - 30) / 2 + 3;
+  return t < 40 ? e : e - 2;
+}, Wn = (t) => t < 40 ? 14 : t > 47 ? 17 : 16, zn = (t) => t < 40 ? 24 : 28, Gn = "VK ID", jn = {
+  [r.RUS]: "Войти c VK ID",
+  [r.UKR]: "Увійти з VK ID",
+  [r.BEL]: "Увайсці з VК ID",
+  [r.KAZ]: "VK ID арқылы кіру",
+  [r.UZB]: "VK ID dan kirish",
+  [r.ENG]: "Sign in with VK ID",
+  [r.SPA]: "Iniciar sesión con VK ID",
+  [r.GERMAN]: "Mit VK-ID anmelden",
+  [r.POL]: "Wejdź z VK ID",
+  [r.FRA]: "Se connecter avec VK ID",
+  [r.TURKEY]: "VK ID aracılığıyla gir"
+}, qn = {
+  [r.RUS]: "Продолжить",
+  [r.UKR]: "Продовжити",
+  [r.BEL]: "Працягнуць",
+  [r.KAZ]: "Жалғастыру",
+  [r.UZB]: "Davom etish",
+  [r.ENG]: "Continue",
+  [r.SPA]: "Continuar",
+  [r.GERMAN]: "Fortfahren",
+  [r.POL]: "Kontynuuj",
+  [r.FRA]: "Continuer",
+  [r.TURKEY]: "Devam"
+}, Zn = `
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path id="logoBg" fill-rule="evenodd" clip-rule="evenodd" d="M4.2653 4.2653C3 5.5306 3 7.56707 3 11.64V12.36C3 16.4329 3 18.4694 4.2653 19.7347C5.5306 21 7.56706 21 11.64 21H12.36C16.4329 21 18.4694 21 19.7347 19.7347C21 18.4694 21 16.4329 21 12.36V11.64C21 7.56707 21 5.5306 19.7347 4.2653C18.4694 3 16.4329 3 12.36 3H11.64C7.56706 3 5.5306 3 4.2653 4.2653Z" fill="white"/>
     <path id="logoIcon" d="M12.6095 16C8.55576 16 6.09636 13.1823 6 8.5H8.05309C8.1171 11.9395 9.67903 13.397 10.8764 13.6967V8.5H12.8439V11.4683C13.9988 11.3401 15.2076 9.98991 15.614 8.5H17.5505C17.2406 10.3321 15.9246 11.6823 14.9948 12.2392C15.9253 12.6895 17.4225 13.8682 18 16H15.8714C15.4219 14.5749 14.321 13.4712 12.8446 13.3213V16H12.6095Z" fill="#0077FF"/>
   </svg>
-`, En = `
+`, Yn = `
   <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M14 22C13.4477 22 13 21.5523 13 21C13 20.4477 13.4477 20 14 20C17.3137 20 20 17.3137 20 14C20 10.6863 17.3137 8 14 8C10.6863 8 8 10.6863 8 14C8 14.6472 8.10214 15.2793 8.3002 15.8802C8.4731 16.4047 8.18807 16.9701 7.66355 17.143C7.13902 17.3159 6.57365 17.0308 6.40074 16.5063C6.13628 15.7041 6 14.8606 6 14C6 9.58172 9.58172 6 14 6C18.4183 6 22 9.58172 22 14C22 18.4183 18.4183 22 14 22Z" fill="currentColor"/>
   </svg>
-`, wn = ({ width: e, height: n, iframeHeight: t, borderRadius: o, openFullAuth: r, skin: s, scheme: u, lang: h = i.RUS, renderOAuthList: v, providers: a }) => (c) => {
-  let S = 0, m = 0, p = 0, C = 0;
-  const f = kn[h], y = yn, R = Sn[h], l = 8, d = vn(n), g = bn(n), b = mn(n), E = document.createElement("div"), k = document.createElement("button");
+`, Xn = ({ width: t, height: e, iframeHeight: n, borderRadius: o, login: i, skin: s, scheme: d, lang: h = r.RUS, renderOAuthList: p, providers: a, setStatsButtonType: y }) => (c) => {
+  let b = 0, g = 0, k = 0, _ = 0;
+  const S = qn[h], R = Gn, l = jn[h], f = 8, v = Fn(e), m = Wn(e), A = zn(e), E = document.createElement("div"), I = document.createElement("button");
   setTimeout(() => {
-    k.classList.add(`VkIdWebSdk__button_animation_${c}`);
-  }, 100), k.classList.add(`VkIdWebSdk__button_${c}`), k.classList.add(`VkIdWebSdk__button_reset_${c}`), r && (k.onclick = r);
-  const I = document.createElement("span");
-  I.classList.add(`VkIdWebSdk__button_in_${c}`);
+    I.classList.add(`VkIdWebSdk__button_animation_${c}`);
+  }, 100), I.classList.add(`VkIdWebSdk__button_${c}`), I.classList.add(`VkIdWebSdk__button_reset_${c}`), i && (I.onclick = i);
   const w = document.createElement("span");
-  w.classList.add(`VkIdWebSdk__button_content_${c}`);
-  const T = document.createElement("span");
-  T.classList.add(`VkIdWebSdk__button_logo_${c}`), T.innerHTML = Cn;
-  const A = document.createElement("span");
-  A.classList.add(`VkIdWebSdk__button_text_${c}`);
-  const $ = document.createElement("span");
-  $.innerText = f;
-  const V = document.createElement("span");
-  V.innerText = R;
+  w.classList.add(`VkIdWebSdk__button_in_${c}`);
+  const x = document.createElement("span");
+  x.classList.add(`VkIdWebSdk__button_content_${c}`);
   const L = document.createElement("span");
-  L.innerText = y;
-  const P = document.createElement("span");
-  P.classList.add(`VkIdWebSdk__button_spinner_${c}`), P.innerHTML = En;
-  const q = document.createElement("div");
-  q.classList.add(`VkIdWebSdk__oauthList_container_${c}`);
-  const Y = (X) => X + 2 * l + 2 * d + 2 * b, re = () => {
-    let X = 0;
-    const ke = () => {
-      const Ee = w.contains(A), Qe = A.contains(L), et = A.contains(V), ie = E.clientWidth;
-      Ee && ie < S && (k.setAttribute("style", `width: ${n}px;`), A.remove(), P.remove()), !Ee && ie >= S && (k.removeAttribute("style"), w.appendChild(A), w.appendChild(P)), !Qe && ie < m && (A.style.width = `${p}px`, V.dataset.active = "", L.dataset.active = "true", setTimeout(() => {
-        V.remove(), A.appendChild(L);
-      }, X)), !et && ie >= m && (A.style.width = `${C}px`, L.dataset.active = "", V.dataset.active = "true", setTimeout(() => {
-        L.remove(), A.appendChild(V);
-      }, X));
+  L.classList.add(`VkIdWebSdk__button_logo_${c}`), L.innerHTML = Zn;
+  const T = document.createElement("span");
+  T.classList.add(`VkIdWebSdk__button_text_${c}`);
+  const F = document.createElement("span");
+  F.innerText = S;
+  const M = document.createElement("span");
+  M.innerText = l;
+  const B = document.createElement("span");
+  B.innerText = R;
+  const j = document.createElement("span");
+  j.classList.add(`VkIdWebSdk__button_spinner_${c}`), j.innerHTML = Yn;
+  const Z = document.createElement("div");
+  Z.classList.add(`VkIdWebSdk__oauthList_container_${c}`);
+  const _t = (rt) => rt + 2 * f + 2 * v + 2 * A, Lt = () => {
+    let rt = 0;
+    const Dt = () => {
+      const Ut = x.contains(T), be = T.contains(B), me = T.contains(M), pt = E.clientWidth;
+      Ut && pt < b && (y("icon"), I.setAttribute("style", `width: ${e}px;`), T.remove(), j.remove()), !Ut && pt >= b && (I.removeAttribute("style"), x.appendChild(T), x.appendChild(j)), !be && pt < g && (T.style.width = `${k}px`, M.dataset.active = "", B.dataset.active = "true", setTimeout(() => {
+        M.remove(), T.appendChild(B);
+      }, rt)), !me && pt >= g && (T.style.width = `${_}px`, B.dataset.active = "", M.dataset.active = "true", setTimeout(() => {
+        B.remove(), T.appendChild(M);
+      }, rt)), y("default");
     };
-    new gn(lt(ke, 500)).observe(E);
-    const Ce = document.getElementById(c);
-    Ce && (Ce.appendChild(E), E.appendChild(k), a != null && a.length && (E.appendChild(q), v({
+    new Hn(Ee(Dt, 500)).observe(E);
+    const Mt = document.getElementById(c);
+    Mt && (Mt.appendChild(E), E.appendChild(I), a != null && a.length && (E.appendChild(Z), p({
       lang: h,
-      scheme: u,
-      container: q,
+      scheme: d,
+      container: Z,
       oauthList: a,
       styles: {
         borderRadius: o,
-        height: n
+        height: e
       }
-    })), k.appendChild(I), I.appendChild(w), w.appendChild(T), w.appendChild(A), w.appendChild(P), A.appendChild($), A.appendChild(V), A.appendChild(L), p = L.clientWidth, C = V.clientWidth, S = Y($.clientWidth), m = Y(C), $.remove(), V.remove(), L.remove(), ke(), X = 250);
+    })), I.appendChild(w), w.appendChild(x), x.appendChild(L), x.appendChild(T), x.appendChild(j), T.appendChild(F), T.appendChild(M), T.appendChild(B), k = B.clientWidth, _ = M.clientWidth, b = _t(F.clientWidth), g = _t(_), F.remove(), M.remove(), B.remove(), Dt(), rt = 250);
   };
-  return document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", re) : setTimeout(re, 0), `
-<div id="${c}" data-test-id="oneTap" data-scheme="${u}" data-skin="${s}">
+  return document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", Lt) : setTimeout(Lt, 0), `
+<div id="${c}" data-test-id="oneTap" data-scheme="${d}" data-skin="${s}">
   <style>
     :root #${c} {
       --onetap--button_background: #0077FF;
@@ -1942,12 +2534,12 @@ const vn = (e) => {
 
     #${c} {
       position: relative;
-      width: ${e ? `${e}px` : "100%"};
-      min-width: ${n}px;
+      width: ${t ? `${t}px` : "100%"};
+      min-width: ${e}px;
     }
 
     #${c}[data-state=loaded] {
-      height: ${t}px;
+      height: ${n}px;
     }
 
     #${c} iframe {
@@ -1976,8 +2568,8 @@ const vn = (e) => {
     }
 
     #${c} .VkIdWebSdk__button_${c} {
-      padding: ${d}px;
-      height: ${n}px;
+      padding: ${v}px;
+      height: ${e}px;
       width: 100%;
       border-radius: ${o}px;
       box-sizing: border-box;
@@ -2025,20 +2617,20 @@ const vn = (e) => {
     #${c} .VkIdWebSdk__button_spinner_${c},
     #${c} .VkIdWebSdk__button_logo_${c} > svg,
     #${c} .VkIdWebSdk__button_spinner_${c} > svg {
-      width: ${b}px;
-      height: ${b}px;
+      width: ${A}px;
+      height: ${A}px;
     }
 
     #${c} .VkIdWebSdk__button_spinner_${c} > svg {
       position: absolute;
-      right: ${d}px;
+      right: ${v}px;
       animation: vkIdSdkButtonSpinner 0.7s linear infinite;
     }
 
     #${c} .VkIdWebSdk__button_text_${c} {
       font-family: -apple-system, system-ui, "Helvetica Neue", Roboto, sans-serif;
       font-weight: 500;
-      font-size: ${g}px;
+      font-size: ${m}px;
       transition: .2s;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -2048,7 +2640,7 @@ const vn = (e) => {
     #${c} .VkIdWebSdk__button_text_${c} > span {
       opacity: 0;
       display: inline-block;
-      padding: 0 ${l}px;
+      padding: 0 ${f}px;
       transition: .5s;
     }
 
@@ -2111,301 +2703,409 @@ const vn = (e) => {
 </div>
   `;
 };
-function An(e, n, t, o) {
-  var r = arguments.length, s = r < 3 ? n : o === null ? o = Object.getOwnPropertyDescriptor(n, t) : o, u;
-  if (typeof Reflect == "object" && typeof Reflect.decorate == "function") s = Reflect.decorate(e, n, t, o);
-  else for (var h = e.length - 1; h >= 0; h--) (u = e[h]) && (s = (r < 3 ? u(s) : r > 3 ? u(n, t, s) : u(n, t)) || s);
-  return r > 3 && s && Object.defineProperty(n, t, s), s;
+function Jn(t, e, n, o) {
+  var i = arguments.length, s = i < 3 ? e : o === null ? o = Object.getOwnPropertyDescriptor(e, n) : o, d;
+  if (typeof Reflect == "object" && typeof Reflect.decorate == "function") s = Reflect.decorate(t, e, n, o);
+  else for (var h = t.length - 1; h >= 0; h--) (d = t[h]) && (s = (i < 3 ? d(s) : i > 3 ? d(e, n, s) : d(e, n)) || s);
+  return i > 3 && s && Object.defineProperty(e, n, s), s;
 }
-const pe = {
+const wt = {
   width: 0,
   height: 44,
   borderRadius: 8
-}, In = 12;
-class oe extends H {
+}, Qn = 12;
+class it extends G {
   constructor() {
-    super(...arguments);
-    _(this, "vkidAppName", "button_one_tap_auth");
+    super();
+    u(this, "analytics");
+    u(this, "vkidAppName", "button_one_tap_auth");
+    u(this, "statsBtnType", null);
+    u(this, "fastAuthDisabled");
+    u(this, "setStatsButtonType", (n) => {
+      this.statsBtnType || (this.statsBtnType = n, this.fastAuthDisabled && this.statsBtnType && this.analytics.sendOneTapButtonNoUserShow(this.statsBtnType));
+    });
+    this.analytics = new kn(it.config);
   }
-  onBridgeMessageHandler(t) {
-    var o, r;
-    switch (t.handler) {
-      case K.LOGIN_SUCCESS: {
-        this.redirectWithPayload(t.params);
+  onBridgeMessageHandler(n) {
+    var o, i;
+    switch (n.handler) {
+      case W.LOGIN_SUCCESS: {
+        const s = n.params;
+        this.redirectWithPayload(s);
         break;
       }
-      case K.SHOW_FULL_AUTH: {
-        const s = {};
-        t.params.screen && (s.screen = t.params.screen), t.params.sdk_oauth && (s.action = {
-          name: "sdk_oauth",
-          params: {
-            oauth: t.params.sdk_oauth
-          }
-        }), this.openFullAuth(s);
+      case W.SHOW_FULL_AUTH: {
+        const s = n.params, d = {};
+        s.screen && (d.screen = s.screen), s.sdk_oauth && (d.provider = s.sdk_oauth, d.statsFlowSource = P.MULTIBRANDING), this.openFullAuth(d);
         break;
       }
-      case K.NOT_AUTHORIZED: {
-        this.setState(M.NOT_LOADED), clearTimeout(this.timeoutTimer), (r = (o = this.elements) == null ? void 0 : o.iframe) == null || r.remove();
+      case W.NOT_AUTHORIZED: {
+        this.analytics.sendNoSessionFound(), this.setState(H.NOT_LOADED), clearTimeout(this.timeoutTimer), (i = (o = this.elements) == null ? void 0 : o.iframe) == null || i.remove();
         break;
       }
-      case K.SHOW_AGREEMENTS_DIALOG: {
-        this.createAgreementsDialogWidget();
+      case W.AUTHENTICATION_INFO: {
+        this.events.emit(W.AUTHENTICATION_INFO, n.params);
         break;
       }
       default: {
-        super.onBridgeMessageHandler(t);
+        super.onBridgeMessageHandler(n);
         break;
       }
     }
   }
-  createAgreementsDialogWidget() {
-    const t = {
-      container: document.body,
-      lang: this.lang,
-      scheme: this.scheme
-    }, o = new ze(), r = (s) => {
-      this.bridge.sendMessage({
-        handler: K.START_AUTHORIZE,
-        params: s.params
-      }), o.off(ne.ACCEPT, r), o.close();
-    };
-    o.on(ne.ACCEPT, r), o.render(t);
+  onErrorHandler(n) {
+    this.analytics.sendFrameLoadingFailed(), this.statsBtnType && this.analytics.sendOneTapButtonNoUserShow(this.statsBtnType), super.onErrorHandler(n);
   }
-  openFullAuth(t) {
+  openFullAuth(n) {
     const o = {
-      ...t,
+      statsFlowSource: P.BUTTON_ONE_TAP,
+      ...n,
+      uniqueSessionId: this.id,
       lang: this.lang,
       scheme: this.scheme
     };
-    oe.__auth.login(o);
+    it.auth.login(o).catch((i) => {
+      this.events.emit($.ERROR, {
+        code: U.AuthError,
+        text: i.error
+      });
+    });
   }
-  renderOAuthList(t) {
-    if (!t.oauthList.length)
+  login(n) {
+    this.statsBtnType && this.analytics.sendOneTapButtonNoUserTap(this.statsBtnType).finally(() => {
+      this.openFullAuth(n);
+    });
+  }
+  renderOAuthList(n) {
+    if (!n.oauthList.length)
       return;
-    new Z().render(t);
+    new z().render({
+      ...n,
+      flowSource: N.NOWHERE,
+      uniqueSessionId: this.id
+    });
   }
-  render(t) {
-    var s, u, h;
-    this.lang = (t == null ? void 0 : t.lang) || i.RUS, this.scheme = (t == null ? void 0 : t.scheme) || te.LIGHT;
-    const o = (t.oauthList || []).filter((v) => v !== N.VK), r = {
-      style_height: ((s = t.styles) == null ? void 0 : s.height) || pe.height,
-      style_border_radius: ((u = t.styles) == null ? void 0 : u.borderRadius) || pe.borderRadius,
-      show_alternative_login: t != null && t.showAlternativeLogin ? 1 : 0,
-      button_skin: t.skin || "primary",
+  render(n) {
+    var s, d, h;
+    this.lang = (n == null ? void 0 : n.lang) || r.RUS, this.scheme = (n == null ? void 0 : n.scheme) || nt.LIGHT, this.fastAuthDisabled = n.fastAuthEnabled === !1;
+    const o = (n.oauthList || []).filter((p) => p !== C.VK), i = {
+      style_height: ((s = n.styles) == null ? void 0 : s.height) || wt.height,
+      style_border_radius: ((d = n.styles) == null ? void 0 : d.borderRadius) || wt.borderRadius,
+      show_alternative_login: n != null && n.showAlternativeLogin ? 1 : 0,
+      button_skin: n.skin || "primary",
       scheme: this.scheme,
       lang_id: this.lang,
-      providers: o.join(",")
+      providers: o.join(","),
+      uuid: this.id
     };
-    return this.templateRenderer = wn({
-      width: ((h = t.styles) == null ? void 0 : h.width) || pe.width,
-      iframeHeight: r.show_alternative_login ? r.style_height * 2 + In : r.style_height,
-      height: r.style_height,
-      borderRadius: r.style_border_radius,
-      openFullAuth: this.openFullAuth.bind(this),
-      skin: r.button_skin,
-      scheme: r.scheme,
-      lang: r.lang_id,
+    return this.analytics.setUniqueSessionId(this.id), this.templateRenderer = Xn({
+      width: ((h = n.styles) == null ? void 0 : h.width) || wt.width,
+      iframeHeight: i.show_alternative_login ? i.style_height * 2 + Qn : i.style_height,
+      height: i.style_height,
+      borderRadius: i.style_border_radius,
+      login: this.login.bind(this),
+      skin: i.button_skin,
+      scheme: i.scheme,
+      lang: i.lang_id,
       renderOAuthList: this.renderOAuthList.bind(this),
-      providers: o
-    }), super.render({
-      container: t.container,
-      ...r
+      providers: o,
+      setStatsButtonType: this.setStatsButtonType.bind(this)
+    }), this.analytics.sendScreenProceed(), this.fastAuthDisabled && (i.fastAuthDisabled = !0), super.render({
+      container: n.container,
+      ...i
     });
   }
 }
-An([
-  de({
+Jn([
+  ft({
     styles: [
-      Rt
+      je
     ]
   })
-], oe.prototype, "render", null);
-var me;
-(function(e) {
-  e.Primary = "primary", e.Secondary = "secondary";
-})(me || (me = {}));
-var U;
-(function(e) {
-  e.LOGIN_SUCCESS = "floatingonetap: success login", e.SHOW_FULL_AUTH = "floatingonetap: show full auth", e.SHOW_AGREEMENTS_DIALOG = "floatingonetap: show agreements dialog", e.START_AUTHORIZE = "floatingonetap: start authorize", e.NOT_AUTHORIZED = "floatingonetap: not authorized";
-})(U || (U = {}));
-var x;
-(function(e) {
-  e[e.SIGN_IN_TO_SERVICE = 0] = "SIGN_IN_TO_SERVICE", e[e.SIGN_IN_TO_ACCOUNT = 1] = "SIGN_IN_TO_ACCOUNT", e[e.REGISTRATION_FOR_EVENT = 2] = "REGISTRATION_FOR_EVENT", e[e.SUBMIT_APPLICATIONS = 3] = "SUBMIT_APPLICATIONS", e[e.MAKE_ORDER_WITH_SERVICE = 4] = "MAKE_ORDER_WITH_SERVICE", e[e.MAKE_ORDER_WITHOUT_SERVICE = 5] = "MAKE_ORDER_WITHOUT_SERVICE";
-})(x || (x = {}));
-const ge = {
-  [i.RUS]: "Войти c VK ID",
-  [i.UKR]: "Увійти з VK ID",
-  [i.ENG]: "Sign in with VK ID",
-  [i.SPA]: "Iniciar sesión con VK ID",
-  [i.GERMAN]: "Mit VK-ID anmelden",
-  [i.POL]: "Wejdź z VK ID",
-  [i.FRA]: "Se connecter avec VK ID",
-  [i.TURKEY]: "VK ID aracılığıyla gir"
-}, $e = {
-  [i.RUS]: "Оформить с VK ID",
-  [i.UKR]: "Оформити з VK ID",
-  [i.ENG]: "Order with VK ID",
-  [i.SPA]: "Pedir con VK ID",
-  [i.GERMAN]: "Mit VK-ID bestellen",
-  [i.POL]: "Wypełnij z VK ID",
-  [i.FRA]: "Commander avec VK ID",
-  [i.TURKEY]: "VK ID aracılığıyla oluştur"
-}, Rn = (e, n) => {
-  switch (e) {
-    case x.SIGN_IN_TO_SERVICE:
-    case x.SIGN_IN_TO_ACCOUNT:
-    case x.REGISTRATION_FOR_EVENT:
-    case x.SUBMIT_APPLICATIONS:
-      return ge[n] || ge[i.RUS];
-    case x.MAKE_ORDER_WITH_SERVICE:
-    case x.MAKE_ORDER_WITHOUT_SERVICE:
-      return $e[n] || $e[i.RUS];
+], it.prototype, "render", null);
+var $t;
+(function(t) {
+  t.Primary = "primary", t.Secondary = "secondary";
+})($t || ($t = {}));
+var O;
+(function(t) {
+  t[t.SIGN_IN_TO_SERVICE = 0] = "SIGN_IN_TO_SERVICE", t[t.SIGN_IN_TO_ACCOUNT = 1] = "SIGN_IN_TO_ACCOUNT", t[t.REGISTRATION_FOR_EVENT = 2] = "REGISTRATION_FOR_EVENT", t[t.SUBMIT_APPLICATIONS = 3] = "SUBMIT_APPLICATIONS", t[t.MAKE_ORDER_WITH_SERVICE = 4] = "MAKE_ORDER_WITH_SERVICE", t[t.MAKE_ORDER_WITHOUT_SERVICE = 5] = "MAKE_ORDER_WITHOUT_SERVICE";
+})(O || (O = {}));
+const to = {
+  [O.SIGN_IN_TO_SERVICE]: "service_sign_in",
+  [O.REGISTRATION_FOR_EVENT]: "event_reg",
+  [O.SUBMIT_APPLICATIONS]: "request",
+  [O.MAKE_ORDER_WITH_SERVICE]: "service_order_placing",
+  [O.MAKE_ORDER_WITHOUT_SERVICE]: "vkid_order_placing",
+  [O.SIGN_IN_TO_ACCOUNT]: "account_sign_in"
+};
+class eo {
+  constructor(e) {
+    u(this, "registrationStatsCollector");
+    u(this, "uniqueSessionId");
+    const n = new q(e), o = new ht(n);
+    this.registrationStatsCollector = new Et(o);
+  }
+  setUniqueSessionId(e) {
+    this.uniqueSessionId = e;
+  }
+  getFields() {
+    const e = [
+      {
+        name: "sdk_type",
+        value: "vkid"
+      }
+    ];
+    return this.uniqueSessionId && e.push({
+      name: "unique_session_id",
+      value: this.uniqueSessionId
+    }), e;
+  }
+  sendScreenProcessed(e) {
+    this.registrationStatsCollector.logEvent(N.NOWHERE, {
+      event_type: "screen_proceed",
+      screen_to: N.FLOATING_ONE_TAP,
+      fields: [
+        ...this.getFields(),
+        {
+          name: "theme_type",
+          value: e.scheme
+        },
+        {
+          name: "language",
+          value: e.lang.toString()
+        },
+        {
+          name: "text_type",
+          value: to[e.contentId]
+        }
+      ]
+    });
+  }
+  sendIframeLoadingFailed() {
+    this.registrationStatsCollector.logEvent(N.FLOATING_ONE_TAP, {
+      event_type: "iframe_loading_failed",
+      fields: this.getFields()
+    });
+  }
+  sendNoUserButtonShow() {
+    this.registrationStatsCollector.logEvent(N.FLOATING_ONE_TAP, {
+      event_type: "no_user_button_show",
+      fields: this.getFields()
+    });
+  }
+  sendNoUserButtonTap() {
+    return this.registrationStatsCollector.logEvent(N.FLOATING_ONE_TAP, {
+      event_type: "no_user_button_tap",
+      fields: this.getFields()
+    });
+  }
+}
+var at;
+(function(t) {
+  t.LOGIN_SUCCESS = "floatingonetap: success login", t.SHOW_FULL_AUTH = "floatingonetap: show full auth", t.START_AUTHORIZE = "floatingonetap: start authorize", t.NOT_AUTHORIZED = "floatingonetap: not authorized";
+})(at || (at = {}));
+const Tt = {
+  [r.RUS]: "Войти c VK ID",
+  [r.UKR]: "Увійти з VK ID",
+  [r.BEL]: "Увайсці з VK ID",
+  [r.KAZ]: "VK ID арқылы кіру",
+  [r.UZB]: "VK ID yordamida kirish",
+  [r.ENG]: "Sign in with VK ID",
+  [r.SPA]: "Iniciar sesión con VK ID",
+  [r.GERMAN]: "Mit VK-ID anmelden",
+  [r.POL]: "Wejdź z VK ID",
+  [r.FRA]: "Se connecter avec VK ID",
+  [r.TURKEY]: "VK ID aracılığıyla gir"
+}, qt = {
+  [r.RUS]: "Оформить с VK ID",
+  [r.UKR]: "Оформити з VK ID",
+  [r.BEL]: "Аформіць з VK ID",
+  [r.KAZ]: "VK ID арқылы рәсімдеу",
+  [r.UZB]: "VK ID yordamida shakllantirish",
+  [r.ENG]: "Order with VK ID",
+  [r.SPA]: "Pedir con VK ID",
+  [r.GERMAN]: "Mit VK-ID bestellen",
+  [r.POL]: "Wypełnij z VK ID",
+  [r.FRA]: "Commander avec VK ID",
+  [r.TURKEY]: "VK ID aracılığıyla oluştur"
+}, no = (t, e) => {
+  switch (t) {
+    case O.SIGN_IN_TO_SERVICE:
+    case O.SIGN_IN_TO_ACCOUNT:
+    case O.REGISTRATION_FOR_EVENT:
+    case O.SUBMIT_APPLICATIONS:
+      return Tt[e] || Tt[r.RUS];
+    case O.MAKE_ORDER_WITH_SERVICE:
+    case O.MAKE_ORDER_WITHOUT_SERVICE:
+      return qt[e] || qt[r.RUS];
     default:
-      return ge[i.RUS];
+      return Tt[r.RUS];
   }
-}, Ve = {
-  [i.RUS]: "Войдите в сервис или зарегистрируйтесь",
-  [i.UKR]: "Увійдіть у сервіс або зареєструйтеся",
-  [i.ENG]: "Sign in to service or sign up",
-  [i.SPA]: "Acceder al servicio o registrarse",
-  [i.GERMAN]: "Melden Sie sich beim Dienst an oder registrieren Sie sich",
-  [i.POL]: "Wejdź do serwisu lub zarejestruj się",
-  [i.FRA]: "Connectez-vous au service ou inscrivez-vous",
-  [i.TURKEY]: "Hizmete girin yada oturum oluşturun"
-}, xn = {
-  [i.RUS]: "Войдите в учётную запись {service}",
-  [i.UKR]: "Увійдіть в обліковий запис {service}",
-  [i.ENG]: "Sign in to {service} account",
-  [i.SPA]: "Acceder a la cuenta {service}",
-  [i.GERMAN]: "Melden Sie sich bei Ihrem {service}-Konto an",
-  [i.POL]: "Wejdź na rachunek {service}",
-  [i.FRA]: "Connectez-vous à {service}",
-  [i.TURKEY]: "{service} hesabına girin"
-}, On = {
-  [i.RUS]: "Зарегистрируйтесь на мероприятие",
-  [i.UKR]: "Зареєструйтеся на захід",
-  [i.ENG]: "Sign up for event",
-  [i.SPA]: "Registrarse en el evento",
-  [i.GERMAN]: "Melden Sie sich für die Veranstaltung an",
-  [i.POL]: "Zarejestruj się na wydarzenie",
-  [i.FRA]: "Inscrivez-vous à l'événement",
-  [i.TURKEY]: "Eylemde kaydolun"
-}, Tn = {
-  [i.RUS]: "Подайте заявку с VK ID",
-  [i.UKR]: "Подайте запит з VK ID",
-  [i.ENG]: "Apply with VK ID",
-  [i.SPA]: "Solicitar con VK ID",
-  [i.GERMAN]: "Bewerben Sie mit VK-ID",
-  [i.POL]: "Złóż wniosek z VK ID",
-  [i.FRA]: "Envoyez une demande avec VK ID",
-  [i.TURKEY]: "VK ID yardımıyla başvuru gönderin"
-}, $n = {
-  [i.RUS]: "Оформите заказ в {service} с VK ID",
-  [i.UKR]: "Оформіть замовлення в {service} з VK ID",
-  [i.ENG]: "Place order on {service} with VK ID",
-  [i.SPA]: "Realizar pedido en {service} con VK ID",
-  [i.GERMAN]: "Machen Sie eine Bestellung auf {service} mit VK-ID",
-  [i.POL]: "Wypełnij zamówienie w {service} z VK ID",
-  [i.FRA]: "Passez la commande sur {service} avec VK ID",
-  [i.TURKEY]: "VK ID aracılığıyla {service} te sipariş oluşturun"
-}, Vn = {
-  [i.RUS]: "Оформите заказ с VK ID",
-  [i.UKR]: "Оформіть замовлення з VK ID",
-  [i.ENG]: "Place order with VK ID",
-  [i.SPA]: "Realizar pedido con VK ID",
-  [i.GERMAN]: "Machen Sie eine Bestellung mit VK-ID",
-  [i.POL]: "Wypełnij zamówienie z VK ID",
-  [i.FRA]: "Passez la commande avec VK ID",
-  [i.TURKEY]: "VK ID aracılığıyla sipariş oluşturun"
-}, Ln = (e, n, t) => {
-  let o = Ve[i.RUS];
-  switch (e) {
-    case x.SIGN_IN_TO_SERVICE:
-      o = Ve[n];
+}, Zt = {
+  [r.RUS]: "Войдите в сервис или зарегистрируйтесь",
+  [r.UKR]: "Увійдіть у сервіс або зареєструйтеся",
+  [r.BEL]: "Увайдзіце ў сэрвіс ці зарэгіструйцеся",
+  [r.KAZ]: "Сервиске кіріңіз немесе тіркеліңіз",
+  [r.UZB]: "Xizmatga kiring va ro‘yxatdan o‘ting",
+  [r.ENG]: "Sign in to service or sign up",
+  [r.SPA]: "Acceder al servicio o registrarse",
+  [r.GERMAN]: "Melden Sie sich beim Dienst an oder registrieren Sie sich",
+  [r.POL]: "Wejdź do serwisu lub zarejestruj się",
+  [r.FRA]: "Connectez-vous au service ou inscrivez-vous",
+  [r.TURKEY]: "Hizmete girin yada oturum oluşturun"
+}, oo = {
+  [r.RUS]: "Войдите в учётную запись {service}",
+  [r.UKR]: "Увійдіть в обліковий запис {service}",
+  [r.BEL]: "Увайдзіце ва ўліковы запіс {service}",
+  [r.KAZ]: "{service} есептік жазбасына кіріңіз",
+  [r.UZB]: "{service} hisobiga kiring",
+  [r.ENG]: "Sign in to {service} account",
+  [r.SPA]: "Acceder a la cuenta {service}",
+  [r.GERMAN]: "Melden Sie sich bei Ihrem {service}-Konto an",
+  [r.POL]: "Wejdź na rachunek {service}",
+  [r.FRA]: "Connectez-vous à {service}",
+  [r.TURKEY]: "{service} hesabına girin"
+}, io = {
+  [r.RUS]: "Зарегистрируйтесь на мероприятие",
+  [r.UKR]: "Зареєструйтеся на захід",
+  [r.BEL]: "Зарэгіструйцеся на мерапрыемства",
+  [r.KAZ]: "Шараға тіркеліңіз",
+  [r.UZB]: "Tadbirda ro‘yxatdan o‘ting",
+  [r.ENG]: "Sign up for event",
+  [r.SPA]: "Registrarse en el evento",
+  [r.GERMAN]: "Melden Sie sich für die Veranstaltung an",
+  [r.POL]: "Zarejestruj się na wydarzenie",
+  [r.FRA]: "Inscrivez-vous à l'événement",
+  [r.TURKEY]: "Eylemde kaydolun"
+}, ro = {
+  [r.RUS]: "Подайте заявку с VK ID",
+  [r.UKR]: "Подайте запит з VK ID",
+  [r.BEL]: "Падайце заяўку з VK ID",
+  [r.KAZ]: "VK ID арқылы тапсырыс жасаңыз",
+  [r.UZB]: "VK ID yordamida talabnoma berish",
+  [r.ENG]: "Apply with VK ID",
+  [r.SPA]: "Solicitar con VK ID",
+  [r.GERMAN]: "Bewerben Sie mit VK-ID",
+  [r.POL]: "Złóż wniosek z VK ID",
+  [r.FRA]: "Envoyez une demande avec VK ID",
+  [r.TURKEY]: "VK ID yardımıyla başvuru gönderin"
+}, so = {
+  [r.RUS]: "Оформите заказ в {service} с VK ID",
+  [r.UKR]: "Оформіть замовлення в {service} з VK ID",
+  [r.BEL]: "Аформіце заказ у {service} з VK ID",
+  [r.KAZ]: "{service} сервисінде  VK ID арқылы тапсырыс жасаңыз",
+  [r.UZB]: "VK ID orqali {service} da buyurtma shakllantirish",
+  [r.ENG]: "Place order on {service} with VK ID",
+  [r.SPA]: "Realizar pedido en {service} con VK ID",
+  [r.GERMAN]: "Machen Sie eine Bestellung auf {service} mit VK-ID",
+  [r.POL]: "Wypełnij zamówienie w {service} z VK ID",
+  [r.FRA]: "Passez la commande sur {service} avec VK ID",
+  [r.TURKEY]: "VK ID aracılığıyla {service} te sipariş oluşturun"
+}, ao = {
+  [r.RUS]: "Оформите заказ с VK ID",
+  [r.UKR]: "Оформіть замовлення з VK ID",
+  [r.BEL]: "Аформіце заказ з VK ID",
+  [r.KAZ]: "VK ID арқылы тапсырыс жасаңыз",
+  [r.UZB]: "VK ID orqali buyurtmani shakllantirish",
+  [r.ENG]: "Place order with VK ID",
+  [r.SPA]: "Realizar pedido con VK ID",
+  [r.GERMAN]: "Machen Sie eine Bestellung mit VK-ID",
+  [r.POL]: "Wypełnij zamówienie z VK ID",
+  [r.FRA]: "Passez la commande avec VK ID",
+  [r.TURKEY]: "VK ID aracılığıyla sipariş oluşturun"
+}, co = (t, e, n) => {
+  let o = Zt[r.RUS];
+  switch (t) {
+    case O.SIGN_IN_TO_SERVICE:
+      o = Zt[e];
       break;
-    case x.SIGN_IN_TO_ACCOUNT:
-      o = xn[n];
+    case O.SIGN_IN_TO_ACCOUNT:
+      o = oo[e];
       break;
-    case x.REGISTRATION_FOR_EVENT:
-      o = On[n];
+    case O.REGISTRATION_FOR_EVENT:
+      o = io[e];
       break;
-    case x.SUBMIT_APPLICATIONS:
-      o = Tn[n];
+    case O.SUBMIT_APPLICATIONS:
+      o = ro[e];
       break;
-    case x.MAKE_ORDER_WITH_SERVICE:
-      o = $n[n];
+    case O.MAKE_ORDER_WITH_SERVICE:
+      o = so[e];
       break;
-    case x.MAKE_ORDER_WITHOUT_SERVICE:
-      o = Vn[n];
+    case O.MAKE_ORDER_WITHOUT_SERVICE:
+      o = ao[e];
       break;
   }
-  return o.replace("{service}", t);
-}, Le = {
-  [i.RUS]: "После этого вам станут доступны все возможности сервиса. Ваши данные будут надёжно защищены.",
-  [i.UKR]: "Після цього вам стануть доступні всі можливості сервісу. Ваші дані будуть надійно захищені.",
-  [i.ENG]: "Afterwards, you'll have access to all of the service's features. Your personal data will be carefully protected.",
-  [i.SPA]: "Después, tendrás acceso a todas las funciones del servicio. Tus datos personales estarán cuidadosamente protegidos.",
-  [i.GERMAN]: "Anschließend stehen Ihnen alle Funktionen des Dienstes zur Verfügung. Ihre persönlichen Daten werden sorgfältig geschützt.",
-  [i.POL]: "Po tym wszystkie funkcje serwisu będą dostępne. Twoje dane będą dobrze chronione.",
-  [i.FRA]: "Cela vous permettra d'avoir accès à toutes les fonctionnalités du service. Vos données personnelles seront soigneusement protégées.",
-  [i.TURKEY]: "Bundan sonra hizmetin tüm özellikleri kullanımınıza sunulacaktır. Verileriniz güvenilir bir şekilde korunacaktır."
-}, Dn = (e) => Le[e] || Le[i.RUS], Nn = `
+  return o.replace("{service}", n);
+}, Yt = {
+  [r.RUS]: "После этого вам станут доступны все возможности сервиса. Ваши данные будут надёжно защищены.",
+  [r.UKR]: "Після цього вам стануть доступні всі можливості сервісу. Ваші дані будуть надійно захищені.",
+  [r.BEL]: "Пасля гэтага вам стануць даступны ўсе магчымасці сэрвісу. Вашы даныя будуць надзейна абаронены.",
+  [r.KAZ]: "Содан кейін сізге сервистің барлық мүмкіндігі қолжетімді болып, деректеріңіз сенімді қораулы болады.",
+  [r.UZB]: "Bundan so‘ng, sizga xizmatning barcha imkoniyatlari ochiladi. Maʼlumotlaringiz ishonchli himoyalanadi.",
+  [r.ENG]: "Afterwards, you'll have access to all of the service's features. Your personal data will be carefully protected.",
+  [r.SPA]: "Después, tendrás acceso a todas las funciones del servicio. Tus datos personales estarán cuidadosamente protegidos.",
+  [r.GERMAN]: "Anschließend stehen Ihnen alle Funktionen des Dienstes zur Verfügung. Ihre persönlichen Daten werden sorgfältig geschützt.",
+  [r.POL]: "Po tym wszystkie funkcje serwisu będą dostępne. Twoje dane będą dobrze chronione.",
+  [r.FRA]: "Cela vous permettra d'avoir accès à toutes les fonctionnalités du service. Vos données personnelles seront soigneusement protégées.",
+  [r.TURKEY]: "Bundan sonra hizmetin tüm özellikleri kullanımınıza sunulacaktır. Verileriniz güvenilir bir şekilde korunacaktır."
+}, lo = (t) => Yt[t] || Yt[r.RUS], uo = `
   <svg width="33" height="16" viewBox="0 0 33 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M20 13H21.6479V3.5H20V13Z" fill="var(--floating--color_text_primary)"/>
     <path d="M23.7801 13H27.474C30.4127 13 32.5 11.0326 32.5 8.24326C32.5 5.46738 30.4127 3.5 27.474 3.5H23.7801V13ZM25.4279 11.5177V4.98227H27.474C29.4377 4.98227 30.7835 6.31631 30.7835 8.24326C30.7835 10.1837 29.4377 11.5177 27.474 11.5177H25.4279Z" fill="var(--floating--color_text_primary)"/>
     <path d="M0 7.68C0 4.05961 0 2.24942 1.12471 1.12471C2.24942 0 4.05961 0 7.68 0H8.32C11.9404 0 13.7506 0 14.8753 1.12471C16 2.24942 16 4.05961 16 7.68V8.32C16 11.9404 16 13.7506 14.8753 14.8753C13.7506 16 11.9404 16 8.32 16H7.68C4.05961 16 2.24942 16 1.12471 14.8753C0 13.7506 0 11.9404 0 8.32V7.68Z" fill="#0077FF"/>
     <path d="M8.56331 11.66C4.91665 11.66 2.83667 9.16 2.75 5H4.57666C4.63666 8.05333 5.9833 9.34333 7.04997 9.61V5H8.77002V7.63C9.82335 7.51667 10.9299 6.32 11.3032 5H13.0233C12.7366 6.62667 11.5366 7.82667 10.6833 8.32C11.5366 8.72 12.9033 9.76667 13.4233 11.66H11.5299C11.1233 10.3933 10.11 9.41333 8.77002 9.28V11.66H8.56331Z" fill="white"/>
   </svg>
-`, Mn = `
+`, ho = `
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path fill-rule="evenodd" clip-rule="evenodd" d="M4.2653 4.2653C3 5.5306 3 7.56707 3 11.64V12.36C3 16.4329 3 18.4694 4.2653 19.7347C5.5306 21 7.56706 21 11.64 21H12.36C16.4329 21 18.4694 21 19.7347 19.7347C21 18.4694 21 16.4329 21 12.36V11.64C21 7.56707 21 5.5306 19.7347 4.2653C18.4694 3 16.4329 3 12.36 3H11.64C7.56706 3 5.5306 3 4.2653 4.2653Z" fill="white"/>
     <path d="M12.6095 16C8.55576 16 6.09636 13.1823 6 8.5H8.05309C8.1171 11.9395 9.67903 13.397 10.8764 13.6967V8.5H12.8439V11.4683C13.9988 11.3401 15.2076 9.98991 15.614 8.5H17.5505C17.2406 10.3321 15.9246 11.6823 14.9948 12.2392C15.9253 12.6895 17.4225 13.8682 18 16H15.8714C15.4219 14.5749 14.321 13.4712 12.8446 13.3213V16H12.6095Z" fill="#0077FF"/>
   </svg>
-`, Hn = `
+`, fo = `
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path fill-rule="evenodd" clip-rule="evenodd" d="M4.71967 4.71969C5.01256 4.42679 5.48744 4.42679 5.78033 4.71969L10 8.93935L14.2197 4.71969C14.5126 4.42679 14.9874 4.42679 15.2803 4.71969C15.5732 5.01258 15.5732 5.48745 15.2803 5.78035L11.0607 10L15.2803 14.2197C15.5732 14.5126 15.5732 14.9875 15.2803 15.2803C14.9874 15.5732 14.5126 15.5732 14.2197 15.2803L10 11.0607L5.78033 15.2803C5.48744 15.5732 5.01256 15.5732 4.71967 15.2803C4.42678 14.9875 4.42678 14.5126 4.71967 14.2197L8.93934 10L4.71967 5.78035C4.42678 5.48745 4.42678 5.01258 4.71967 4.71969Z" fill="currentColor"/>
   </svg>
-`, Wn = `
+`, _o = `
   <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M14 22C13.4477 22 13 21.5523 13 21C13 20.4477 13.4477 20 14 20C17.3137 20 20 17.3137 20 14C20 10.6863 17.3137 8 14 8C10.6863 8 8 10.6863 8 14C8 14.6472 8.10214 15.2793 8.3002 15.8802C8.4731 16.4047 8.18807 16.9701 7.66355 17.143C7.13902 17.3159 6.57365 17.0308 6.40074 16.5063C6.13628 15.7041 6 14.8606 6 14C6 9.58172 9.58172 6 14 6C18.4183 6 22 9.58172 22 14C22 18.4183 18.4183 22 14 22Z" fill="currentColor"/>
   </svg>
-`, De = 12, ve = (e) => !e || e <= De ? 0 : e - De, Pn = ({ scheme: e, indent: n, openFullAuth: t, close: o, lang: r, contentId: s, appName: u, providers: h, renderOAuthList: v }) => (a) => {
-  const c = Ln(s, r, u), S = Dn(r), m = Rn(s, r), p = document.createElement("div");
-  p.classList.add(`VkIdWebSdk__floating_${a}`);
-  const C = document.createElement("div");
-  C.classList.add(`VkIdWebSdk__floating_container_${a}`);
-  const f = document.createElement("div");
-  f.classList.add(`VkIdWebSdk__floating_header_${a}`), f.innerHTML = Nn;
-  const y = document.createElement("span");
-  y.classList.add(`VkIdWebSdk__floating_appName_${a}`), y.innerText = ` · ${u}`;
+`, Xt = 12, Ot = (t) => !t || t <= Xt ? 0 : t - Xt, po = ({ scheme: t, indent: e, login: n, close: o, lang: i, contentId: s, appName: d, providers: h, renderOAuthList: p }) => (a) => {
+  const y = co(s, i, d), c = lo(i), b = no(s, i), g = document.createElement("div");
+  g.classList.add(`VkIdWebSdk__floating_${a}`);
+  const k = document.createElement("div");
+  k.classList.add(`VkIdWebSdk__floating_container_${a}`);
+  const _ = document.createElement("div");
+  _.classList.add(`VkIdWebSdk__floating_header_${a}`), _.innerHTML = uo;
+  const S = document.createElement("span");
+  S.classList.add(`VkIdWebSdk__floating_appName_${a}`), S.innerText = ` · ${d}`;
   const R = document.createElement("div");
   R.classList.add(`VkIdWebSdk__floating_close_${a}`);
   const l = document.createElement("button");
-  l.classList.add(`VkIdWebSdk__floating_button_reset_${a}`), l.classList.add(`VkIdWebSdk__floating_close_btn_${a}`), l.innerHTML = Hn, o && (l.onclick = o);
-  const d = document.createElement("div");
-  d.classList.add(`VkIdWebSdk__floating_content_${a}`);
-  const g = document.createElement("div");
-  g.classList.add(`VkIdWebSdk__floating_title_${a}`), g.innerText = c;
-  const b = document.createElement("div");
-  b.classList.add(`VkIdWebSdk__floating_description_${a}`), b.innerText = S;
-  const E = document.createElement("div"), k = document.createElement("button");
-  k.classList.add(`VkIdWebSdk__floating_button_reset_${a}`), k.classList.add(`VkIdWebSdk__floating_button_${a}`), t && (k.onclick = t);
+  l.classList.add(`VkIdWebSdk__floating_button_reset_${a}`), l.classList.add(`VkIdWebSdk__floating_close_btn_${a}`), l.innerHTML = fo, o && (l.onclick = o);
+  const f = document.createElement("div");
+  f.classList.add(`VkIdWebSdk__floating_content_${a}`);
+  const v = document.createElement("div");
+  v.classList.add(`VkIdWebSdk__floating_title_${a}`), v.innerText = y;
+  const m = document.createElement("div");
+  m.classList.add(`VkIdWebSdk__floating_description_${a}`), m.innerText = c;
+  const A = document.createElement("div"), E = document.createElement("button");
+  E.classList.add(`VkIdWebSdk__floating_button_reset_${a}`), E.classList.add(`VkIdWebSdk__floating_button_${a}`), n && (E.onclick = n);
   const I = document.createElement("div");
   I.classList.add(`VkIdWebSdk__floating_button_content_${a}`);
   const w = document.createElement("span");
-  w.classList.add(`VkIdWebSdk__floating_button_logo_${a}`), w.innerHTML = Mn;
-  const T = document.createElement("span");
-  T.classList.add(`VkIdWebSdk__floating_button_text_${a}`), T.innerText = m;
-  const A = document.createElement("span");
-  A.classList.add(`VkIdWebSdk__floating_button_spinner_${a}`), A.innerHTML = Wn;
-  const $ = document.createElement("div");
-  $.classList.add(`VkIdWebSdk__oauthList_container_${a}`);
-  const V = () => {
-    const L = document.getElementById(a);
-    L && (L.appendChild(p), p.appendChild(C), C.appendChild(f), C.appendChild(d), C.appendChild(E), f.appendChild(R), f.appendChild(y), R.appendChild(l), d.appendChild(g), d.appendChild(b), E.appendChild(k), k.appendChild(I), I.appendChild(w), I.appendChild(T), I.appendChild(A), h != null && h.length && (C.appendChild($), v({
-      lang: r,
-      scheme: e,
-      container: $,
+  w.classList.add(`VkIdWebSdk__floating_button_logo_${a}`), w.innerHTML = ho;
+  const x = document.createElement("span");
+  x.classList.add(`VkIdWebSdk__floating_button_text_${a}`), x.innerText = b;
+  const L = document.createElement("span");
+  L.classList.add(`VkIdWebSdk__floating_button_spinner_${a}`), L.innerHTML = _o;
+  const T = document.createElement("div");
+  T.classList.add(`VkIdWebSdk__oauthList_container_${a}`);
+  const F = () => {
+    const M = document.getElementById(a);
+    M && (M.appendChild(g), g.appendChild(k), k.appendChild(_), k.appendChild(f), k.appendChild(A), _.appendChild(R), _.appendChild(S), R.appendChild(l), f.appendChild(v), f.appendChild(m), A.appendChild(E), E.appendChild(I), I.appendChild(w), I.appendChild(x), I.appendChild(L), h != null && h.length && (k.appendChild(T), p({
+      lang: i,
+      scheme: t,
+      container: T,
       oauthList: h,
       styles: {
         borderRadius: 8,
@@ -2413,8 +3113,8 @@ const ge = {
       }
     })));
   };
-  return document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", V) : setTimeout(V, 0), `
-<div id="${a}" data-test-id="floatingOneTap" data-scheme="${e}">
+  return document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", F) : setTimeout(F, 0), `
+<div id="${a}" data-test-id="floatingOneTap" data-scheme="${t}">
   <style>
     :root #${a} {
       --floating--contaner_padding: 16px;
@@ -2636,15 +3336,15 @@ const ge = {
         align-items: flex-end;
         left: 0;
         right: 0;
-        bottom: ${ve(n.bottom)}px;
+        bottom: ${Ot(e.bottom)}px;
         width: 100%;
         height: 340px;
       }
     }
     @media (min-width: 481px) {
       #${a} {
-        top: ${ve(n.top)}px;
-        right: ${ve(n.right)}px;
+        top: ${Ot(e.top)}px;
+        right: ${Ot(e.right)}px;
         width: 384px;
         height: 360px;
       }
@@ -2663,159 +3363,167 @@ const ge = {
 </div>
   `;
 };
-function Kn(e, n, t, o) {
-  var r = arguments.length, s = r < 3 ? n : o === null ? o = Object.getOwnPropertyDescriptor(n, t) : o, u;
-  if (typeof Reflect == "object" && typeof Reflect.decorate == "function") s = Reflect.decorate(e, n, t, o);
-  else for (var h = e.length - 1; h >= 0; h--) (u = e[h]) && (s = (r < 3 ? u(s) : r > 3 ? u(n, t, s) : u(n, t)) || s);
-  return r > 3 && s && Object.defineProperty(n, t, s), s;
+function go(t, e, n, o) {
+  var i = arguments.length, s = i < 3 ? e : o === null ? o = Object.getOwnPropertyDescriptor(e, n) : o, d;
+  if (typeof Reflect == "object" && typeof Reflect.decorate == "function") s = Reflect.decorate(t, e, n, o);
+  else for (var h = t.length - 1; h >= 0; h--) (d = t[h]) && (s = (i < 3 ? d(s) : i > 3 ? d(e, n, s) : d(e, n)) || s);
+  return i > 3 && s && Object.defineProperty(e, n, s), s;
 }
-const Un = {
+const vo = {
   top: 12,
   right: 12,
   bottom: 12
 };
-class he extends H {
+class ut extends G {
   constructor() {
-    super(...arguments);
-    _(this, "vkidAppName", "floating_one_tap_auth");
+    super();
+    u(this, "analytics");
+    u(this, "vkidAppName", "floating_one_tap_auth");
+    this.analytics = new eo(ut.config);
   }
-  onBridgeMessageHandler(t) {
-    switch (t.handler) {
-      case U.LOGIN_SUCCESS: {
-        this.redirectWithPayload(t.params);
+  onBridgeMessageHandler(n) {
+    switch (n.handler) {
+      case at.LOGIN_SUCCESS: {
+        const o = n.params;
+        this.redirectWithPayload(o);
         break;
       }
-      case U.SHOW_FULL_AUTH: {
-        const o = {};
-        t.params.screen && (o.screen = t.params.screen), t.params.sdk_oauth && (o.action = {
-          name: "sdk_oauth",
-          params: {
-            oauth: t.params.sdk_oauth
-          }
-        }), this.openFullAuth(o);
+      case at.SHOW_FULL_AUTH: {
+        const o = n.params, i = {};
+        o.screen && (i.screen = o.screen), o.sdk_oauth && (i.provider = o.sdk_oauth, i.statsFlowSource = P.MULTIBRANDING), this.openFullAuth(i);
         break;
       }
-      case U.NOT_AUTHORIZED: {
-        this.setState(M.NOT_LOADED), setTimeout(() => {
-          this.setState(M.LOADED);
+      case at.NOT_AUTHORIZED: {
+        this.setState(H.NOT_LOADED), setTimeout(() => {
+          this.setState(H.LOADED);
         }, 500), clearTimeout(this.timeoutTimer);
         break;
       }
-      case U.SHOW_AGREEMENTS_DIALOG: {
-        this.createAgreementsDialogWidget();
-        break;
-      }
       default: {
-        super.onBridgeMessageHandler(t);
+        super.onBridgeMessageHandler(n);
         break;
       }
     }
   }
-  createAgreementsDialogWidget() {
-    const t = {
-      container: document.body,
-      lang: this.lang,
-      scheme: this.scheme
-    }, o = new ze(), r = (s) => {
-      this.bridge.sendMessage({
-        handler: U.START_AUTHORIZE,
-        params: s.params
-      }), o.off(G.ACCEPT, r), o.close();
-    };
-    o.on(G.ACCEPT, r), o.render(t);
+  onErrorHandler(n) {
+    this.analytics.sendIframeLoadingFailed(), this.analytics.sendNoUserButtonShow(), super.onErrorHandler(n);
   }
-  openFullAuth(t) {
+  openFullAuth(n) {
     const o = {
-      ...t,
+      statsFlowSource: P.FLOATING_ONE_TAP,
+      ...n,
+      uniqueSessionId: this.id,
       lang: this.lang,
       scheme: this.scheme
     };
-    he.__auth.login(o);
+    ut.auth.login(o).catch((i) => {
+      this.events.emit($.ERROR, {
+        code: U.AuthError,
+        text: i.error
+      });
+    });
   }
-  renderOAuthList(t) {
-    if (!t.oauthList.length)
+  login(n) {
+    this.analytics.sendNoUserButtonTap().finally(() => {
+      this.openFullAuth(n);
+    });
+  }
+  renderOAuthList(n) {
+    if (!n.oauthList.length)
       return;
-    new Z().render(t);
+    new z().render({
+      ...n,
+      flowSource: N.FLOATING_ONE_TAP,
+      uniqueSessionId: this.id
+    });
   }
-  render(t) {
-    this.lang = (t == null ? void 0 : t.lang) || i.RUS, this.scheme = (t == null ? void 0 : t.scheme) || te.LIGHT;
-    const o = (t.oauthList || []).filter((s) => s !== N.VK), r = {
+  render(n) {
+    this.lang = (n == null ? void 0 : n.lang) || r.RUS, this.scheme = (n == null ? void 0 : n.scheme) || nt.LIGHT;
+    const o = (n.oauthList || []).filter((s) => s !== C.VK), i = {
       scheme: this.scheme,
       lang_id: this.lang,
-      show_alternative_login: t != null && t.showAlternativeLogin ? 1 : 0,
-      content_id: (t == null ? void 0 : t.contentId) || x.SIGN_IN_TO_SERVICE,
-      providers: o.join(",")
+      show_alternative_login: n != null && n.showAlternativeLogin ? 1 : 0,
+      content_id: (n == null ? void 0 : n.contentId) || O.SIGN_IN_TO_SERVICE,
+      providers: o.join(","),
+      uuid: this.id
     };
-    return this.templateRenderer = Pn({
-      openFullAuth: this.openFullAuth.bind(this),
+    return this.analytics.setUniqueSessionId(this.id), this.templateRenderer = po({
+      login: this.login.bind(this),
       close: this.close.bind(this),
       scheme: this.scheme,
       lang: this.lang,
-      indent: Object.assign(Un, t.indent || {}),
-      contentId: r.content_id,
-      appName: t.appName,
+      indent: Object.assign(vo, n.indent || {}),
+      contentId: i.content_id,
+      appName: n.appName,
       renderOAuthList: this.renderOAuthList.bind(this),
       providers: o
-    }), super.render({
+    }), this.analytics.sendScreenProcessed({
+      scheme: this.scheme,
+      lang: this.lang,
+      contentId: i.content_id
+    }), n.fastAuthEnabled === !1 && (this.analytics.sendNoUserButtonShow(), i.fastAuthDisabled = !0), super.render({
       container: document.body,
-      ...r
+      ...i
     });
   }
 }
-Kn([
-  de({
+go([
+  ft({
     appName: [
-      Pe
+      vt
     ]
   })
-], he.prototype, "render", null);
-const fe = new Et();
-ae.__config = fe;
-const Xe = new ae();
-H.__config = fe;
-H.__auth = Xe;
-const Bn = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+], ut.prototype, "render", null);
+const kt = new oe();
+bt.config = kt;
+const ge = new bt();
+G.config = kt;
+G.auth = ge;
+const bo = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  Auth: Xe,
+  Auth: ge,
   get AuthErrorCode() {
+    return V;
+  },
+  Config: kt,
+  get ConfigAuthMode() {
+    return ct;
+  },
+  FloatingOneTap: ut,
+  get FloatingOneTapContentId() {
     return O;
   },
-  Config: fe,
-  get ConfigAuthMode() {
-    return Q;
-  },
-  FloatingOneTap: he,
-  get FloatingOneTapContentId() {
-    return x;
-  },
   get Languages() {
-    return i;
+    return r;
   },
-  OAuthList: Z,
+  OAuthList: z,
   get OAuthName() {
-    return N;
+    return C;
   },
-  OneTap: oe,
+  OneTap: it,
   get OneTapSkin() {
-    return me;
+    return $t;
+  },
+  get Prompt() {
+    return lt;
   },
   get Scheme() {
-    return te;
+    return nt;
   },
   get WidgetEvents() {
-    return D;
+    return $;
   }
 }, Symbol.toStringTag, { value: "Module" }));
-console.log(Bn);
-fe.init({
+console.log(bo);
+kt.init({
   app: 51982623,
   redirectUrl: "https://financelabs.github.io/myworkbook/",
   state: "state",
   codeVerifier: "codeVerifier",
   scope: "phone email"
 });
-const Je = new oe();
-console.log(Je);
-const Ne = document.getElementById("VkIdSdkOneTap");
-Ne && Je.render({ container: Ne }).on(D.ERROR, console.error);
+const ve = new it();
+console.log(ve);
+const Jt = document.getElementById("VkIdSdkOneTap");
+Jt && ve.render({ container: Jt }).on($.ERROR, console.error);
 //# sourceMappingURL=editfirenodewithvkauth.js.map
